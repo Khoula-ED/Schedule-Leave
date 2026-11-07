@@ -1,0 +1,2099 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Khoula ED Roster Block 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a sticky top bar (title + four view tabs) over one centred column.
+   Day view = scrollable date strip, 3rd-on-call banner, then one card per shift.
+   Grid view = the full 28-day table with a sticky name column.
+   Person view = one person's block, week by week, with totals and a change request.
+   Changes view = the change log, request rules, and (for the rota maker) the form that records a change. */
+:root {
+  --bg: #F4F6F8;
+  --surface: #FFFFFF;
+  --surface-2: #EAEEF2;
+  --fg: #14212B;
+  --muted: #5A6B7B;
+  --line: #D5DCE3;
+  --accent: #0B6E8C;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #D9EEF4;
+  --today: #0B6E8C;
+  --weekend: #EEF3F7;
+  --warn-fg: #8A4A1C; --warn-soft: #F6E4D6;
+  --ok-fg: #2F6B2A; --ok-soft: #DBF0D6;
+  --chg: #B4530A;
+  --viol: #C81E1E; --viol-soft: #FBE3E3;
+  --soft-viol: #B86E00; --soft-viol-soft: #FFF0D6;
+
+  --m-fg: #7A4E06;  --m-soft: #FBEBC2;  --m-dot: #E0A526;
+  --e-fg: #9A2840;  --e-soft: #FADDE2;  --e-dot: #D9596F;
+  --n-fg: #353C9E;  --n-soft: #DEE1FA;  --n-dot: #5B64D6;
+  --oc-fg: #0A5E7C; --oc-soft: #D5ECF5; --oc-dot: #2B9CC5;
+  --c-fg: #0F6B5F;  --c-soft: #D2F0EA;  --c-dot: #2BA893;
+  --pm-fg: #2F6B2A; --pm-soft: #DBF0D6; --pm-dot: #5DAE52;
+  --off-fg: #6B7784; --off-soft: #EEF1F4;
+  --lv-fg: #6A5B8E; --lv-soft: #ECE8F5;
+  --ph-fg: #8A4A1C; --ph-soft: #F6E4D6;
+  --third-bg: #F2B33D; --third-fg: #2B1A00;
+  --leave: #C0392B; --leave-req: #E07B6E;
+  --s1-bg: #D7EFD9; --s1-fg: #1F5B2A; --s2-bg: #FBEBA6; --s2-fg: #6B5300; --s3-bg: #F9D1B3; --s3-fg: #7A3A10; --s4-bg: #F2A066; --s4-fg: #4A1C00; --s5-bg: #C0392B; --s5-fg: #FFFFFF;
+
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(20,33,43,.06), 0 4px 14px rgba(20,33,43,.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E151C; --surface: #16202A; --surface-2: #1E2A36; --fg: #E7ECF1; --muted: #93A4B5;
+    --line: #2B3843; --accent: #3FB1D3; --accent-fg: #06212B; --accent-soft: #113645; --today: #3FB1D3;
+    --weekend: #141D26;
+    --warn-fg: #E0A57E; --warn-soft: #3A2415;
+    --ok-fg: #9ED694; --ok-soft: #16301A;
+    --chg: #F0A560;
+    --viol: #FF7A7A; --viol-soft: #4A1A1A;
+    --soft-viol: #F2B35A; --soft-viol-soft: #3F2E10;
+    --m-fg: #F3C65C; --m-soft: #3A2C0D; --m-dot: #E0A526;
+    --e-fg: #F39BAC; --e-soft: #3E1A24; --e-dot: #D9596F;
+    --n-fg: #AEB4F5; --n-soft: #232852; --n-dot: #7C84E8;
+    --oc-fg: #7CCBE8; --oc-soft: #0F2E3C; --oc-dot: #2B9CC5;
+    --c-fg: #7AD7C6; --c-soft: #0F3029; --c-dot: #2BA893;
+    --pm-fg: #9ED694; --pm-soft: #16301A; --pm-dot: #5DAE52;
+    --off-fg: #8E9BA8; --off-soft: #1B242D;
+    --lv-fg: #B9ACD9; --lv-soft: #262238;
+    --ph-fg: #E0A57E; --ph-soft: #3A2415;
+    --third-bg: #D9A032; --third-fg: #1C1100;
+  --leave: #D04A3C; --leave-req: #E8897C;
+  --s1-bg: #1D3A24; --s1-fg: #A9E0B0; --s2-bg: #4A3C08; --s2-fg: #F5DC7A; --s3-bg: #5A2E12; --s3-fg: #F5BE93; --s4-bg: #7A3C12; --s4-fg: #FBD1A8; --s5-bg: #B8362A; --s5-fg: #FFFFFF;
+    --leave: #D04A3C; --leave-req: #E8897C;
+    --s1-bg: #1D3A24; --s1-fg: #A9E0B0; --s2-bg: #4A3C08; --s2-fg: #F5DC7A; --s3-bg: #5A2E12; --s3-fg: #F5BE93; --s4-bg: #7A3C12; --s4-fg: #FBD1A8; --s5-bg: #B8362A; --s5-fg: #FFFFFF;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E151C; --surface: #16202A; --surface-2: #1E2A36; --fg: #E7ECF1; --muted: #93A4B5;
+  --line: #2B3843; --accent: #3FB1D3; --accent-fg: #06212B; --accent-soft: #113645; --today: #3FB1D3;
+  --weekend: #141D26;
+  --warn-fg: #E0A57E; --warn-soft: #3A2415;
+  --ok-fg: #9ED694; --ok-soft: #16301A;
+  --chg: #F0A560;
+  --viol: #FF7A7A; --viol-soft: #4A1A1A;
+  --soft-viol: #F2B35A; --soft-viol-soft: #3F2E10;
+  --m-fg: #F3C65C; --m-soft: #3A2C0D; --m-dot: #E0A526;
+  --e-fg: #F39BAC; --e-soft: #3E1A24; --e-dot: #D9596F;
+  --n-fg: #AEB4F5; --n-soft: #232852; --n-dot: #7C84E8;
+  --oc-fg: #7CCBE8; --oc-soft: #0F2E3C; --oc-dot: #2B9CC5;
+  --c-fg: #7AD7C6; --c-soft: #0F3029; --c-dot: #2BA893;
+  --pm-fg: #9ED694; --pm-soft: #16301A; --pm-dot: #5DAE52;
+  --off-fg: #8E9BA8; --off-soft: #1B242D;
+  --lv-fg: #B9ACD9; --lv-soft: #262238;
+  --ph-fg: #E0A57E; --ph-soft: #3A2415;
+  --third-bg: #D9A032; --third-fg: #1C1100;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--surface); z-index: 10;
+}
+button, select, input, textarea { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.top-inner {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 10px 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.brand { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+.brand h1 { font-size: 20px; font-weight: 700; letter-spacing: .01em; }
+.brand h1 .dept { color: var(--muted); font-weight: 500; }
+.brand h1 .dept::before { content: "· "; }
+@media (max-width: 560px) { .brand h1 .dept { display: block; font-size: 16px; } .brand h1 .dept::before { content: none; } }
+.brand .block { color: var(--muted); font-size: 13px; font-family: var(--font-display); font-weight: 500; letter-spacing: .02em; }
+.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px 10px;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: .02em;
+  color: var(--muted); cursor: pointer; border-radius: 4px 4px 0 0; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+}
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--fg); }
+.tab .badge { background: var(--chg); color: #fff; border-radius: 999px; font-size: 11px; padding: 0 6px; line-height: 16px; font-weight: 700; }
+
+/* ---------- page column ---------- */
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 24px;
+}
+.view { display: flex; flex-direction: column; gap: 14px; }
+
+/* ---------- date strip ---------- */
+.strip-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.strip-head .label { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.btn {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; color: var(--fg); display: inline-block;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn.primary:disabled { opacity: .6; cursor: default; }
+.btn.danger { color: var(--e-fg); }
+.strip {
+  display: flex; gap: 4px; overflow-x: auto; padding: 4px 2px 8px; scroll-snap-type: x proximity;
+  scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+}
+.strip .week-gap { flex: 0 0 8px; }
+.day-btn {
+  flex: 0 0 auto; width: 46px; min-width: 46px; scroll-snap-align: center;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 8px;
+  padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  cursor: pointer; position: relative;
+}
+.day-btn .dow { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.day-btn .dnum { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.1; }
+.day-btn .mon { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.day-btn.weekend { background: var(--weekend); }
+.day-btn.weekend .dow { color: var(--e-fg); }
+.day-btn.today::after {
+  content: ""; position: absolute; left: 50%; bottom: 3px; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--today); transform: translateX(-50%);
+}
+.day-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.day-btn[aria-pressed="true"] .dow, .day-btn[aria-pressed="true"] .mon { color: var(--accent-fg); opacity: .85; }
+.day-btn[aria-pressed="true"].today::after { background: var(--accent-fg); }
+
+/* ---------- day header + 3rd on call ---------- */
+.dayhead { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: stretch; }
+@media (max-width: 560px) { .dayhead { grid-template-columns: 1fr; } }
+.datecard {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.datecard .eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.datecard h2 { font-size: 26px; font-weight: 700; line-height: 1.1; }
+.datecard .sub { color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pill { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; letter-spacing: .03em; background: var(--surface-2); color: var(--muted); }
+.pill.today { background: var(--accent-soft); color: var(--accent); }
+.pill.weekend { background: var(--e-soft); color: var(--e-fg); }
+.pill.chg { background: var(--warn-soft); color: var(--warn-fg); }
+.pill.ph { background: var(--ph-soft); color: var(--ph-fg); }
+.tel { font-size: 12px; color: var(--accent); text-decoration: none; white-space: nowrap; font-variant-numeric: tabular-nums; margin-left: 8px; }
+.tel:hover { text-decoration: underline; }
+.contact { font-size: 13px; color: var(--muted); margin: -4px 0 12px; } .contact .tel { font-size: 13px; margin-left: 0; } .contact a.mail { color: var(--accent); text-decoration: none; }
+.day-btn.ph .dow, table.grid thead .dh.ph .dow { color: var(--ph-fg); }
+.day-btn.ph .dnum, table.grid thead .dh.ph .dnum { color: var(--ph-fg); }
+.third {
+  background: var(--third-bg); color: var(--third-fg); border-radius: var(--radius); padding: 14px 18px;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 200px;
+}
+.third .eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; opacity: .85; }
+.third .name { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.05; }
+.third .note { font-size: 12px; opacity: .8; }
+
+/* ---------- shift cards ---------- */
+.shifts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .shifts { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; min-width: 0; box-shadow: var(--shadow);
+}
+.card .head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; border-bottom: 1px solid var(--line);
+}
+.card .head h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.card .head .time { font-size: 12px; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
+.card .head .count { font-family: var(--font-display); font-weight: 600; color: var(--muted); font-size: 13px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+.card.m .dot { background: var(--m-dot); } .card.e .dot { background: var(--e-dot); } .card.n .dot { background: var(--n-dot); }
+.card.oc .dot { background: var(--oc-dot); } .card.c .dot { background: var(--c-dot); } .card.pm .dot { background: var(--pm-dot); }
+.card.m .head { background: var(--m-soft); } .card.e .head { background: var(--e-soft); } .card.n .head { background: var(--n-soft); }
+.card.m .head h3, .card.m .head .time, .card.m .head .count { color: var(--m-fg); }
+.card.e .head h3, .card.e .head .time, .card.e .head .count { color: var(--e-fg); }
+.card.n .head h3, .card.n .head .time, .card.n .head .count { color: var(--n-fg); }
+.people { list-style: none; margin: 0; padding: 6px 0; }
+.people li {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 14px; min-width: 0;
+}
+.people li + li { border-top: 1px solid var(--line); }
+.people .who { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.people .name { font-weight: 500; }
+.people .grade { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .03em; }
+.role {
+  flex: 0 0 auto; font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: .02em;
+  padding: 2px 8px; border-radius: 6px; background: var(--surface-2); color: var(--muted); white-space: nowrap;
+}
+.role.r { background: var(--e-soft); color: var(--e-fg); }
+.role.s { background: var(--n-soft); color: var(--n-fg); }
+.role.t { background: var(--c-soft); color: var(--c-fg); }
+.role.c { background: var(--oc-soft); color: var(--oc-fg); }
+.role.hod { background: var(--m-soft); color: var(--m-fg); }
+.role.star { background: var(--ph-soft); color: var(--ph-fg); }
+.code.admin, table.grid td .cell.admin { background: var(--m-soft); color: var(--m-fg); opacity: .7; } .stat.admin .v { color: var(--m-fg); }
+.role.course { background: var(--c-soft); color: var(--c-fg); }
+.role.chg { background: var(--warn-soft); color: var(--warn-fg); }
+.role.fm { background: var(--pm-soft); color: var(--pm-fg); }
+.roles { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.subhead {
+  padding: 6px 14px 4px; font-family: var(--font-display); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600; background: var(--surface-2);
+}
+.empty { padding: 12px 14px; color: var(--muted); font-size: 13px; }
+
+.extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.extras .card .head { background: var(--surface); }
+.extras .card.oc .head h3 { color: var(--oc-fg); } .extras .card.c .head h3 { color: var(--c-fg); } .extras .card.pm .head h3 { color: var(--pm-fg); }
+.kv { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 14px; gap: 10px; }
+.kv .big { font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1; }
+
+details.off { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+details.off summary {
+  cursor: pointer; padding: 10px 14px; font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; list-style: none;
+}
+details.off summary::-webkit-details-marker { display: none; }
+details.off summary .chev { color: var(--muted); font-size: 12px; transition: transform .15s; }
+details.off[open] summary .chev { transform: rotate(180deg); }
+details.off .body { border-top: 1px solid var(--line); padding: 10px 14px 12px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.offgroup .gl { font-family: var(--font-display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+.offgroup .names { font-size: 14px; color: var(--fg); line-height: 1.6; }
+.offgroup.off .gl { color: var(--off-fg); } .offgroup.lv .gl { color: var(--lv-fg); } .offgroup.ph .gl { color: var(--ph-fg); }
+
+/* ---------- legend ---------- */
+.legend { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: 13px; }
+.legend h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+.legend ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.legend li { display: flex; gap: 8px; align-items: baseline; }
+.code {
+  font-family: var(--font-display); font-weight: 700; font-size: 12px; min-width: 34px; text-align: center;
+  padding: 1px 5px; border-radius: 5px; background: var(--surface-2); color: var(--fg); position: relative;
+}
+.code.m { background: var(--m-soft); color: var(--m-fg); } .code.e { background: var(--e-soft); color: var(--e-fg); }
+.code.n { background: var(--n-soft); color: var(--n-fg); } .code.oc { background: var(--oc-soft); color: var(--oc-fg); }
+.code.c { background: var(--c-soft); color: var(--c-fg); } .code.pm { background: var(--pm-soft); color: var(--pm-fg); }
+.code.rel { background: var(--c-soft); color: var(--c-fg); box-shadow: inset 0 0 0 1px var(--c-dot); }
+.hours-bad { color: var(--viol) !important; font-weight: 700; }
+table.grid td.name .hoursbadge { display: inline-block; margin-left: 6px; font-family: var(--font-display); font-size: 11px; font-weight: 700; padding: 0 5px; border-radius: 5px; background: var(--viol-soft); color: var(--viol); }
+.code.off { background: var(--off-soft); color: var(--off-fg); } .code.lv { background: var(--lv-soft); color: var(--lv-fg); }
+.code.ph { background: var(--ph-soft); color: var(--ph-fg); } .code.none { background: transparent; color: var(--muted); }
+.code.chg::after, .cell.chg::after { content: ""; position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--chg); }
+.cell.req, .code.req { box-shadow: inset 0 0 0 2px var(--ok-fg); }
+.cell.req::before, .code.req::before { content: "\2713"; position: absolute; bottom: 0; right: 3px; font-size: 9px; line-height: 1; color: var(--ok-fg); font-weight: 700; }
+.role.req { background: var(--ok-soft); color: var(--ok-fg); }
+.reqlog li .what b { color: var(--ok-fg); }
+.cell.pol-bad, .code.pol-bad { box-shadow: inset 0 0 0 2px var(--viol); background: var(--viol-soft) !important; color: var(--viol) !important; }
+.cell.pol-warn, .code.pol-warn { box-shadow: inset 0 0 0 2px var(--soft-viol); background: var(--soft-viol-soft) !important; color: var(--soft-viol) !important; }
+table.grid td.name .polbadge { display: inline-block; margin-left: 6px; font-family: var(--font-display); font-size: 11px; font-weight: 700; padding: 0 5px; border-radius: 5px; background: var(--viol-soft); color: var(--viol); }
+.role.pol { background: var(--viol-soft); color: var(--viol); }
+.role.polw { background: var(--soft-viol-soft); color: var(--soft-viol); }
+.polnote { background: var(--viol-soft); color: var(--viol); border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+.pagefoot {
+  max-width: 1080px; margin: 0 auto; color: var(--muted); font-size: 12px; text-align: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 36px; display: grid; gap: 2px;
+}
+.pagefoot .by { color: var(--fg); font-weight: 600; font-family: var(--font-display); font-size: 13px; letter-spacing: .02em; }
+
+/* ---------- grid view ---------- */
+.gridtools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.gridtools .hint { color: var(--muted); font-size: 13px; }
+.gridwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); -webkit-overflow-scrolling: touch; }
+table.grid { border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: max-content; }
+table.grid th, table.grid td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 0; text-align: center; white-space: nowrap; }
+table.grid th.name, table.grid td.name {
+  position: sticky; left: 0; z-index: 2; background: var(--surface); text-align: left; padding: 0 10px; font-weight: 500;
+  min-width: 128px; max-width: 160px; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 1px 0 0 var(--line);
+}
+table.grid thead th { position: sticky; top: 0; z-index: 3; background: var(--surface); }
+table.grid thead th.name { z-index: 4; }
+table.grid thead .dh { width: 44px; min-width: 44px; padding: 0; }
+table.grid thead .dh button {
+  width: 100%; border: 0; background: none; cursor: pointer; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.1;
+}
+table.grid thead .dh .dow { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+table.grid thead .dh .dnum { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+table.grid thead .dh.weekend .dow { color: var(--e-fg); }
+table.grid thead .dh button:hover { background: var(--surface-2); }
+table.grid .weekend { background: var(--weekend); }
+table.grid .today-col { box-shadow: inset 0 0 0 2px var(--today); }
+table.grid tr.third td { background: var(--third-bg); color: var(--third-fg); font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .03em; padding: 4px 0; }
+table.grid tr.third td.name { background: var(--surface); color: var(--fg); font-weight: 600; }
+table.grid tr.section td { background: var(--surface-2); text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 5px 10px; }
+table.grid tr.section td.name { background: var(--surface-2); }
+table.grid td .cell { display: block; height: 30px; line-height: 30px; font-family: var(--font-display); font-weight: 600; font-size: 12px; position: relative; }
+table.grid td .cell.m { background: var(--m-soft); color: var(--m-fg); } table.grid td .cell.e { background: var(--e-soft); color: var(--e-fg); }
+table.grid td .cell.n { background: var(--n-soft); color: var(--n-fg); } table.grid td .cell.oc { background: var(--oc-soft); color: var(--oc-fg); }
+table.grid td .cell.c { background: var(--c-soft); color: var(--c-fg); } table.grid td .cell.pm { background: var(--pm-soft); color: var(--pm-fg); }
+table.grid td .cell.rel { background: var(--c-soft); color: var(--c-fg); box-shadow: inset 0 0 0 1px var(--c-dot); }
+table.grid td .cell.off { color: var(--off-fg); } table.grid td .cell.lv { background: var(--lv-soft); color: var(--lv-fg); }
+table.grid td .cell.ph { background: var(--ph-soft); color: var(--ph-fg); } table.grid td .cell.none { color: var(--muted); }
+table.grid td.tot { min-width: 40px; color: var(--muted); font-family: var(--font-display); font-weight: 600; }
+table.grid td.tot.shiftsum { color: var(--fg); }
+table.grid thead th.tot { font-family: var(--font-display); font-size: 11px; letter-spacing: .06em; color: var(--muted); padding: 0 6px; }
+
+/* ---------- person view ---------- */
+.picker { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.picker label { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+select.sel, input.inp, textarea.inp {
+  font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); max-width: 100%;
+}
+select.sel { padding-right: 36px; min-width: 200px; }
+.picker select.sel { min-width: 220px; }
+.mylink { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px; }
+.mylink-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1 1 200px; }
+.mylink-label { font-family: var(--font-display); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.mylink .url { font-size: 13px; color: var(--accent); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.mylink .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.total { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; }
+.total-main { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.total-main .v { font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 1; }
+.total-main .k { font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+.total-sub { color: var(--muted); font-size: 13px; display: flex; gap: 6px 14px; flex-wrap: wrap; }
+.total-sub b { color: var(--fg); font-weight: 600; }
+.bar { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.stat .v { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1; }
+.stat .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.draftcheck { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.stats .tally { grid-column: 1 / -1; font-size: 13px; color: var(--muted); line-height: 1.5; padding: 2px 2px 0; }
+.stats .tally b { color: var(--fg); }
+.stat.m .v { color: var(--m-fg); } .stat.e .v { color: var(--e-fg); } .stat.n .v { color: var(--n-fg); } .stat.oc .v { color: var(--oc-fg); } .stat.c .v { color: var(--c-fg); }
+.hint-p { margin: 0; color: var(--muted); font-size: 13px; }
+.weeks { display: grid; gap: 12px; }
+.week { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.week .wh { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--line); font-family: var(--font-display); font-weight: 600; font-size: 14px; }
+.week .wh .third-tag { font-size: 12px; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
+.week .wh .third-tag b { color: var(--fg); font-weight: 600; }
+.wdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.wday { padding: 8px 4px 10px; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; cursor: pointer; background: none; border-top: 0; border-bottom: 0; border-left: 0; }
+.wday:last-child { border-right: 0; }
+.wday.weekend { background: var(--weekend); }
+.wday .d { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.wday .d b { display: block; font-family: var(--font-display); font-size: 15px; color: var(--fg); letter-spacing: 0; }
+.wday .code { min-width: 0; width: 100%; max-width: 56px; font-size: 13px; padding: 4px 2px; }
+.wday .lab { font-size: 10px; color: var(--muted); line-height: 1.2; overflow-wrap: anywhere; }
+.wday.today .d b { color: var(--accent); }
+@media (max-width: 420px) { .wday .lab { display: none; } }
+
+/* ---------- rotators ---------- */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 11px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+.chip small { font-family: var(--font-body); font-weight: 500; font-size: 10px; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.chip[aria-pressed="true"] small { color: var(--accent-fg); opacity: .85; }
+.chip.now { box-shadow: inset 0 0 0 2px var(--today); }
+.rot { display: grid; gap: 12px; }
+.rot-head { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.rot-head h2 { font-size: 22px; font-weight: 700; }
+.rot-head .sub { color: var(--muted); font-size: 13px; }
+.rot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.rot .card .head h3 { font-size: 15px; }
+.rot .card .head .count { font-size: 12px; }
+.rot .people li { align-items: flex-start; }
+.rot .people .meta { font-size: 12px; color: var(--muted); display: block; }
+.rot .release { padding: 8px 14px 10px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); background: var(--surface-2); }
+.rot .release b { color: var(--fg); font-weight: 600; }
+.lvl { font-family: var(--font-display); font-weight: 600; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: var(--surface-2); color: var(--muted); white-space: nowrap; flex: 0 0 auto; }
+.lvl.em { background: var(--n-soft); color: var(--n-fg); }
+.lvl.on { background: var(--ok-soft); color: var(--ok-fg); }
+.lvl.lv { background: var(--lv-soft); color: var(--lv-fg); }
+.lvl.bad { background: var(--e-soft); color: var(--e-fg); }
+#policyCard .people li { padding: 8px 16px; }
+#policyCard .people .meta { display: block; font-size: 12px; color: var(--muted); }
+#policyCard .roles { align-items: center; gap: 8px; }
+#policyCard .roles b { font-family: var(--font-display); font-size: 18px; }
+
+/* ---------- forms (request + record a change) ---------- */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 12px; }
+.panel h3 { font-size: 17px; font-weight: 700; }
+.panel .lead { margin: 0; color: var(--muted); font-size: 13px; }
+.fields { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-family: var(--font-display); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.field .sel, .field .inp { width: 100%; min-width: 0; }
+.field .now { font-size: 12px; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; width: max-content; }
+.seg button { border: 0; background: none; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.preview { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 14px; display: grid; gap: 6px; }
+.preview .line b { font-weight: 600; }
+.warn { background: var(--warn-soft); color: var(--warn-fg); border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-top: 6px; }
+.ok { background: var(--ok-soft); color: var(--ok-fg); border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.msgbox { width: 100%; min-height: 130px; resize: vertical; font-family: var(--font-body); font-size: 14px; }
+.rules { margin: 0; padding-left: 18px; font-size: 14px; display: grid; gap: 4px; }
+.changelog { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.changelog li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; display: grid; gap: 4px; }
+.changelog .when { font-family: var(--font-display); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.changelog .what { font-size: 14px; }
+.changelog .what b { font-weight: 600; }
+.changelog .note { font-size: 13px; color: var(--muted); }
+.status { font-size: 13px; color: var(--muted); }
+.status.err { color: var(--e-fg); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- annual leave tab ---------- */
+.leavetools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.leavetools .label { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.leavetools .status { margin-left: auto; }
+.lchart { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: auto; max-height: 70vh; position: relative; --cell: 22px; --row: 26px; --hm: 26px; --hb: 24px; --hw: 24px; --hband: 26px; --hd: 24px; --hdow: 22px; }
+.lchart.lv-year { --cell: 7px; }
+.lchart table { border-collapse: separate; border-spacing: 0; table-layout: fixed; font-variant-numeric: tabular-nums; min-width: 0; font-size: 12px; }
+.lchart th, .lchart td { padding: 0; height: var(--row); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; font-weight: 500; white-space: nowrap; }
+.lchart col.lv-day { width: var(--cell); }
+.lchart col.lv-name { width: 150px; }
+.lchart thead th { position: sticky; background: var(--surface); z-index: 2; overflow: hidden; }
+.lchart thead tr.lv-months th { top: 0; height: var(--hm); font-family: var(--font-display); font-weight: 700; font-size: 13px; background: var(--surface-2); }
+.lchart thead tr.lv-blocks th { top: var(--hm); height: var(--hb); font-family: var(--font-display); font-weight: 600; font-size: 12px; color: var(--accent); }
+.lchart thead tr.lv-weeks th { top: calc(var(--hm) + var(--hb)); height: var(--hw); font-family: var(--font-display); font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.lchart thead tr.lv-band th { top: calc(var(--hm) + var(--hb) + var(--hw)); height: var(--hband); font-family: var(--font-display); font-size: 12.5px; font-weight: 700; }
+.lchart thead tr.lv-days th { top: calc(var(--hm) + var(--hb) + var(--hw) + var(--hband)); height: var(--hd); font-size: 10px; font-weight: 600; letter-spacing: -.02em; }
+.lchart thead tr.lv-dow th { top: calc(var(--hm) + var(--hb) + var(--hw) + var(--hband) + var(--hd)); height: var(--hdow); font-size: 10.5px; color: var(--muted); font-weight: 500; }
+.lchart thead tr.lv-days th.lv-first { font-weight: 700; }
+.lchart th.lv-corner, .lchart td.lv-who { position: sticky; left: 0; z-index: 3; background: var(--surface); text-align: left; padding: 0 10px; font-family: var(--font-display); font-weight: 600; font-size: 13px; }
+.lchart thead th.lv-corner { z-index: 4; }
+.lchart thead th.lv-corner.lv-lbl { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.lchart thead tr.lv-weeks th .lv-short { display: none; }
+.lchart.lv-year thead tr.lv-weeks th .lv-full { display: none; }
+.lchart.lv-year thead tr.lv-weeks th .lv-short { display: inline; }
+.lchart.lv-year thead tr.lv-days, .lchart.lv-year thead tr.lv-dow { display: none; }
+.lchart.lv-year th, .lchart.lv-year td { border-right-color: transparent; }
+.lchart.lv-year th.lv-wkend, .lchart.lv-year td.lv-wkend { border-right-color: var(--line); }
+.lchart.lv-year thead tr.lv-months th, .lchart.lv-year thead tr.lv-blocks th, .lchart.lv-year thead tr.lv-weeks th, .lchart.lv-year thead tr.lv-band th, .lchart.lv-year th.lv-corner, .lchart.lv-year td.lv-who { border-right-color: var(--line); }
+.lchart td.lv-we, .lchart th.lv-we { background: var(--weekend); }
+.lchart tbody tr.lv-person td { background: var(--surface); }
+.lchart tbody tr.lv-person td.lv-we { background: var(--weekend); }
+.lchart td.lv-bar { position: relative; }
+.lchart td.lv-bar::after { content: ""; position: absolute; inset: 4px 0; background: var(--leave); }
+.lchart td.lv-bar.lv-req::after { background: repeating-linear-gradient(135deg, var(--leave) 0 3px, var(--surface) 3px 6px); box-shadow: inset 0 0 0 1px var(--leave); }
+.lchart td.lv-bar.lv-s::after { left: 2px; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+.lchart td.lv-bar.lv-e::after { right: 2px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+.lchart.lv-year td.lv-bar::after { inset: 5px -1px 5px 0; }
+.lchart.lv-year td.lv-bar.lv-s::after { left: 0; border-radius: 0; }
+.lchart.lv-year td.lv-bar.lv-e::after { right: 0; border-radius: 0; }
+.lchart tbody tr.lv-total td, .lchart tbody tr.lv-total td.lv-who { background: var(--surface-2); font-weight: 700; font-size: 11.5px; }
+.lchart tbody tr.lv-total td.lv-zero { color: var(--muted); font-weight: 500; }
+.lchart.lv-year tbody tr.lv-total td { font-size: 0; }
+.lchart.lv-year tbody tr.lv-total td.lv-who { font-size: 12.5px; }
+.lchart.lv-year tbody tr.lv-total td.lv-n1 { background: var(--s1-bg); } .lchart.lv-year tbody tr.lv-total td.lv-n2 { background: var(--s2-bg); }
+.lchart.lv-year tbody tr.lv-total td.lv-n3 { background: var(--s3-bg); } .lchart.lv-year tbody tr.lv-total td.lv-n4 { background: var(--s4-bg); } .lchart.lv-year tbody tr.lv-total td.lv-n5 { background: var(--s5-bg); }
+.lv-s1 { background: var(--s1-bg) !important; color: var(--s1-fg); } .lv-s2 { background: var(--s2-bg) !important; color: var(--s2-fg); }
+.lv-s3 { background: var(--s3-bg) !important; color: var(--s3-fg); } .lv-s4 { background: var(--s4-bg) !important; color: var(--s4-fg); } .lv-s5 { background: var(--s5-bg) !important; color: var(--s5-fg); }
+.lchart th.lv-td, .lchart td.lv-td { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent); }
+.lchart.lv-year th.lv-td, .lchart.lv-year td.lv-td { box-shadow: inset 1px 0 0 var(--accent), inset -1px 0 0 var(--accent); }
+.lchart thead tr.lv-days th.lv-td { background: var(--accent); color: var(--accent-fg); font-weight: 700; }
+.lchart tbody tr.lv-person td.lv-td { background: var(--accent-soft); }
+.lchart .lv-empty { padding: 28px 16px; color: var(--muted); text-align: center; }
+.llegend { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.llegend .k { display: inline-flex; align-items: center; gap: 6px; }
+.llegend .sw { width: 22px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,.08); }
+.llegend .sw.lv { background: var(--leave); }
+.llegend .sw.lvr { background: repeating-linear-gradient(135deg, var(--leave) 0 3px, var(--surface) 3px 6px); border-color: var(--leave); }
+.llegend .sw.lv-we { background: var(--weekend); border-color: var(--line); }
+.llegend .scale { display: inline-flex; gap: 3px; align-items: center; }
+.llegend .scale span { font-family: var(--font-display); font-weight: 700; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+.lvlist { display: grid; gap: 6px; }
+.inbox { display: grid; gap: 8px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; background: var(--surface-2); }
+.inbox .lvlist .row { background: var(--surface); }
+.lvlist .row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13px; }
+.lvlist .row .nm { font-family: var(--font-display); font-weight: 600; min-width: 120px; }
+.lvlist .row .dt { font-variant-numeric: tabular-nums; }
+.lvlist .row .nt { color: var(--muted); font-size: 12.5px; }
+.lvlist .row .act { margin-left: auto; display: inline-flex; gap: 6px; }
+.lvpill { display: inline-block; font: 600 11px/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; }
+.lvpill.ok { background: var(--ok-soft); color: var(--ok-fg); }
+.lvpill.req { background: var(--warn-soft); color: var(--warn-fg); }
+.tbtn { font: 600 12px/1 var(--font-display); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+.tbtn.danger { color: var(--e-fg); }
+.lchart.lv-block { --cell: 30px; --row: 28px; --hb: 0px; }
+.lweeks { display: grid; gap: 6px; }
+.lweeks .wk { display: grid; grid-template-columns: 150px 56px 1fr; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.lweeks .wk.now { box-shadow: inset 0 0 0 2px var(--accent); }
+.lweeks .wk .d { font-family: var(--font-display); font-weight: 600; }
+.lweeks .wk .d small { display: block; color: var(--muted); font-weight: 500; font-size: 11.5px; }
+.lweeks .wk .n { justify-self: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; padding: 4px 0; width: 44px; text-align: center; border-radius: 6px; }
+.lweeks .wk .names { min-width: 0; line-height: 1.5; }
+.lweeks .wk .names .rq { color: var(--muted); font-style: italic; }
+.lweeks .mh { font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 10px 0 2px; }
+@media (max-width: 600px) { .lweeks .wk { grid-template-columns: 110px 48px 1fr; gap: 8px; padding: 8px 10px; } .lchart.lv-block { --cell: 24px; } }
+@media (max-width: 600px) { .lchart { --cell: 19px; --row: 25px; } .lchart col.lv-name { width: 112px; } .lchart th.lv-corner, .lchart td.lv-who { padding: 0 8px; font-size: 12px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <h1>Khoula Hospital <span class="dept">Emergency Department</span></h1>
+      <div class="block" id="blockLabel"></div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-day" aria-selected="true" aria-controls="view-day" data-view="day">Day</button>
+      <button class="tab" role="tab" id="tab-grid" aria-selected="false" aria-controls="view-grid" data-view="grid">Full grid</button>
+      <button class="tab" role="tab" id="tab-staff" aria-selected="false" aria-controls="view-staff" data-view="staff">By person</button>
+      <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="view-changes" data-view="changes">Changes <span class="badge" id="chgBadge" hidden></span></button>
+      <button class="tab" role="tab" id="tab-rotators" aria-selected="false" aria-controls="view-rotators" data-view="rotators">Rotators</button>
+      <button class="tab" role="tab" id="tab-leave" aria-selected="false" aria-controls="view-leave" data-view="leave">Leave</button>
+      <button class="tab" role="tab" id="tab-prev" aria-selected="false" aria-controls="view-prev" data-view="prev" hidden>Previous blocks</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view" id="view-day" role="tabpanel" aria-labelledby="tab-day">
+    <div class="strip-head">
+      <div class="label">Pick a day</div>
+      <button class="btn" id="todayBtn" type="button">Today</button>
+    </div>
+    <div class="strip" id="strip" aria-label="Days in this block"></div>
+    <div class="dayhead">
+      <div class="datecard">
+        <div class="eyebrow" id="weekLabel"></div>
+        <h2 id="dateTitle"></h2>
+        <div class="sub" id="dateSub"></div>
+      </div>
+      <div class="third" id="thirdCard">
+        <div class="eyebrow">3rd on call</div>
+        <div class="name" id="thirdName"></div>
+        <div class="note" id="thirdNote"></div>
+      </div>
+    </div>
+    <div class="shifts" id="shifts"></div>
+    <div class="extras" id="extras"></div>
+    <details class="off" id="offDetails">
+      <summary><span id="offSummary">Off duty today</span><span class="chev">▼</span></summary>
+      <div class="body" id="offBody"></div>
+    </details>
+  </section>
+
+  <section class="view" id="view-grid" role="tabpanel" aria-labelledby="tab-grid" hidden>
+    <div class="gridtools">
+      <div class="hint">Tap a date in the header to open that day. The name column stays put while you scroll sideways. A dot marks a cell changed since the roster was issued.</div>
+    </div>
+    <div class="gridwrap" id="gridwrap"></div>
+    <div class="legend" id="legend2"></div>
+  </section>
+
+  <section class="view" id="view-staff" role="tabpanel" aria-labelledby="tab-staff" hidden>
+    <div class="picker">
+      <label for="personSelect">Person</label>
+      <select class="sel" id="personSelect"></select>
+    </div>
+    <div class="mylink">
+      <div class="mylink-text"><span class="mylink-label">Personal link</span><span class="url" id="myLink"></span></div>
+      <div class="actions">
+        <button class="btn" id="copyLink" type="button">Copy link</button>
+        <button class="btn primary" id="reqBtn" type="button">Request a change</button>
+        <a class="btn" id="nextReqLink" href="#" target="_blank" rel="noopener" hidden>Requests for next block</a>
+      </div>
+    </div>
+    <div class="panel" id="reqPanel" hidden>
+      <h3>Request a change</h3>
+      <p class="lead" id="reqLead"></p>
+      <div class="fields">
+        <div class="field"><label for="reqDay">Date</label><select class="sel" id="reqDay"></select><span class="now" id="reqNow"></span></div>
+        <div class="field"><label for="reqKind">Request</label><select class="sel" id="reqKind"><option value="swap">Swap with a colleague</option><option value="other">Other change</option></select></div>
+        <div class="field" id="reqWithField"><label for="reqWith">Swap with</label><select class="sel" id="reqWith"></select><span class="now" id="reqWithNow"></span></div>
+        <div class="field" id="reqOtherField" hidden><label for="reqOther">Proposed change</label><input class="inp" id="reqOther" type="text" placeholder="e.g. move to Evening, or take leave"></div>
+        <div class="field"><label for="reqReason">Reason</label><input class="inp" id="reqReason" type="text" placeholder="brief reason"></div>
+      </div>
+      <div class="field"><label for="reqMsg">Message to send</label><textarea class="inp msgbox" id="reqMsg" readonly></textarea></div>
+      <div class="actions">
+        <button class="btn primary" id="reqCopy" type="button">Copy message</button>
+        <a class="btn" id="reqWa" href="#" target="_blank" rel="noopener" hidden>Send on WhatsApp</a>
+      </div>
+    </div>
+    <div class="contact" id="personContact" hidden></div>
+    <div class="total" id="total"></div>
+    <div class="panel" id="policyCard" hidden></div>
+    <div class="stats" id="stats"></div>
+    <p class="hint-p">Each person has their own link above. It opens straight to their roster; the rest of the page is still a tap away.</p>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <section class="view" id="view-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <div class="panel" id="adminPanel" hidden>
+      <h3>Record a change</h3>
+      <p class="lead">Only the rota maker sees this. Publishing updates the roster for everyone who opens the page and adds the change to the log below.</p>
+      <div class="seg" role="group" aria-label="Kind of change">
+        <button type="button" id="kindSwap" aria-pressed="true">Swap</button>
+        <button type="button" id="kindEdit" aria-pressed="false">Single change</button>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="admA">Person</label><select class="sel" id="admA"></select></div>
+        <div class="field"><label for="admDayA">Date</label><select class="sel" id="admDayA"></select><span class="now" id="admNowA"></span></div>
+        <div class="field" id="admBField"><label for="admB">Swap with</label><select class="sel" id="admB"></select></div>
+        <div class="field" id="admDayBField"><label for="admDayB">Their date (same day for a straight swap)</label><select class="sel" id="admDayB"></select><span class="now" id="admNowB"></span></div>
+        <div class="field" id="admCodeField" hidden><label for="admCode">New code</label><select class="sel" id="admCode"></select></div>
+        <div class="field"><label for="admNote">Note (who asked, reason)</label><input class="inp" id="admNote" type="text" placeholder="e.g. requested by Asad, family event"></div>
+      </div>
+      <div class="preview" id="admPreview"></div>
+      <div id="admWarn"></div>
+      <div class="actions">
+        <button class="btn primary" id="admPublish" type="button">Publish change</button>
+        <button class="btn danger" id="admUndo" type="button" hidden>Undo last change</button>
+        <span class="status" id="admStatus"></span>
+      </div>
+      <div class="draftcheck" id="admCheck" hidden>
+        <p class="lead">This roster has not been marked as checked. When you have gone through it, record that here: the live page then says who checked it, and the block changeover goes ahead without a warning.</p>
+        <div class="actions"><button class="btn" id="admChecked" type="button">Mark as checked by the rota maker</button><span class="status" id="admCheckStatus"></span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>How changes work</h3>
+      <ul class="rules">
+        <li>This page is the roster. A change counts only once it appears here, and attendance follows the page.</li>
+        <li>Swaps are like for like and agreed by both doctors. Resus in-charge and supervisor slots go only to someone qualified for that role.</li>
+        <li>Ask at least 48 hours ahead, except in an emergency. Requests go to the rota maker, who approves and publishes.</li>
+        <li>Residents' swaps also go through the programme, as duty hours must be checked.</li>
+      </ul>
+      <p class="lead">A change to this block: open your name under "By person" and tap "Request a change". Leave, courses, days off and preferences for the next block: add a line to the requests sheet before the roster is made.</p>
+      <div class="actions"><a class="btn primary" id="nextReqLink2" href="#" target="_blank" rel="noopener" hidden>Requests for next block</a></div>
+    </div>
+    <div>
+      <div class="strip-head"><div class="label">Change log</div><span class="status" id="chgStamp"></span></div>
+      <ul class="changelog" id="changelog"></ul>
+      <div class="strip-head" id="reqHead" hidden><div class="label">Requests for this block</div><span class="status" id="reqStamp"></span></div>
+      <ul class="changelog reqlog" id="reqlog" hidden></ul>
+    </div>
+  </section>
+  <section class="view" id="view-rotators" role="tabpanel" aria-labelledby="tab-rotators" hidden>
+    <div class="strip-head">
+      <div class="label">Residents rotating at Khoula ED · AY 2026–2027</div>
+    </div>
+    <div class="chips" id="blockChips" aria-label="Blocks"></div>
+    <div id="rotatorsBody"></div>
+    <p class="hint-p" id="rotatorsSource"></p>
+  </section>
+  <section class="view" id="view-leave" role="tabpanel" aria-labelledby="tab-leave" hidden>
+    <div class="leavetools">
+      <div class="label">Annual leave plan</div>
+      <div class="seg" role="group" aria-label="Show by"><button type="button" id="lvModeBlock" aria-pressed="true">Block</button><button type="button" id="lvModeWeek" aria-pressed="false">Week</button><button type="button" id="lvModeYear" aria-pressed="false">Year</button></div>
+      <div class="chips" id="lvChips"></div>
+      <span class="status" id="lvStamp"></span>
+    </div>
+    <p class="hint-p" id="lvSummary"></p>
+    <div class="lchart" id="leaveChart" tabindex="0" aria-label="Annual leave chart"></div>
+    <div class="lweeks" id="leaveWeeks" hidden></div>
+    <div class="llegend" id="lvLegend">
+      <span class="k"><i class="sw lv"></i>Approved leave</span>
+      <span class="k"><i class="sw lvr"></i>Requested, not yet approved</span>
+      <span class="k"><i class="sw we"></i>Friday / Saturday</span>
+      <span class="k">On leave in the week: <span class="scale"><span class="lv-s1">0–1</span><span class="lv-s2">2</span><span class="lv-s3">3</span><span class="lv-s4">4</span><span class="lv-s5">5+</span></span></span>
+    </div>
+    <div class="strip-head"><div class="label">Requests</div></div>
+    <div class="panel" id="lvAdmin" hidden>
+      <h3>Enter or approve annual leave</h3>
+      <p class="lead">Only the rota maker sees this. Saving puts the leave on the chart for everyone who opens the page.</p>
+      <div class="inbox" id="lvInbox">
+        <div class="strip-head"><div class="label">New requests on the sheet</div><button class="btn" id="lvInboxRefresh" type="button">Check the sheet</button></div>
+        <div class="lvlist" id="lvInboxList"><div class="row"><span class="nt">Checking the request sheet…</span></div></div>
+      </div>
+      <div class="fields">
+        <div class="field"><label for="lvaName">Name</label><select class="sel" id="lvaName"></select></div>
+        <div class="field" id="lvaOtherField" hidden><label for="lvaOther">Other name</label><input class="inp" id="lvaOther" type="text" maxlength="40"></div>
+        <div class="field"><label for="lvaFrom">From</label><input class="inp" id="lvaFrom" type="date"></div>
+        <div class="field"><label for="lvaTo">To</label><input class="inp" id="lvaTo" type="date"></div>
+        <div class="field"><label for="lvaStatus">Status</label><select class="sel" id="lvaStatus"><option value="requested">Requested</option><option value="approved">Approved</option></select></div>
+        <div class="field"><label for="lvaNote">Note</label><input class="inp" id="lvaNote" type="text" maxlength="140" placeholder="optional"></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="lvaSave" type="button">Save to the chart</button>
+        <button class="btn" id="lvaCancel" type="button" hidden>Cancel</button>
+        <span class="status" id="lvaStatusLine"></span>
+      </div>
+      <div class="strip-head"><div class="label">Entries</div><span class="status" id="lvaCount"></span></div>
+      <div class="lvlist" id="lvaList"></div>
+    </div>
+    <div class="panel" id="lvRequest">
+      <h3>Request annual leave</h3>
+      <p class="lead" id="lvrLead">Add a row to the request sheet: your name and the dates. The rota maker sees it on this page, puts it on the chart as a request (hatched) and approves it (red).</p>
+      <div class="actions">
+        <a class="btn primary" id="lvrOpen" href="#" target="_blank" rel="noopener">Open the request sheet</a>
+        <span class="status" id="lvrHint">Pick your name from the list and the dates from the calendar.</span>
+      </div>
+    </div>
+    <p class="hint-p" id="lvNote"></p>
+  </section>
+  <section class="view" id="view-prev" role="tabpanel" aria-labelledby="tab-prev" hidden>
+    <div class="strip-head"><div class="label" id="prevLabel">Previous blocks</div><span class="status" id="prevStamp"></span></div>
+    <div class="chips" id="prevChips" aria-label="Previous blocks" hidden></div>
+    <div class="gridtools"><div class="hint" id="prevHint">The full grid of each block before this one, as it stood when that block ended. Read-only.</div></div>
+    <div class="gridwrap" id="prevwrap"></div>
+    <div class="legend" id="legend3"></div>
+  </section>
+</main>
+<footer class="pagefoot" id="footNote"></footer>
+
+<script>
+(function () {
+  const DATA = {"block":{"label":"Block 3","year":"AY 2026","start":"2026-10-25","days":28,"hospital":"Khoula Hospital","dept":"Emergency Department","checkedBy":"Dr. Khalifa Al-Yousfi","createdBy":"Dr. Isra Al Lawati"},"policyFlags":false,"thirdOnCall":["Salim","Khalifa","Duaa","Khalifa"],"staff":[{"name":"Khalifa (HOD)","codes":["M","M","M","M","M","O","O","M","M","M","M","M","O","O","M","M","M","M","M","O","O","M","M","M","M","M","O","O"],"po":0,"ph":0},{"name":"Isra","codes":["L","L","L","L","L","L","L","L","L","L","L","L","O","O","Mr","C","C","C","O","O","O","C","C","Er","Nr","O","O","O"],"po":0,"ph":0},{"name":"Salim","codes":["Mr","M*","Mr","Mr","C","O","O","C","M*","O","Es","O","C","C","Es","C","C","Mr","C","O","O","Es","O","O","C","C","O","O"],"po":4,"ph":11},{"name":"Duaa","codes":["L","L","L","L","L","O","O","Mr","C/Nt","O","O","Mr","O","O","Mt","C","Nt","O","O","Er","O","O","C","M*","Mr","Mr","O","O"],"po":0,"ph":3},{"name":"Bushra","codes":["Mc","PM","M","PM","PM","O","O","M","PM","Mc","PM","PM","O","O","M","PM","Mc","PM","PM","O","O","Mc","PM","Mc","PM","PM","O","O"],"po":0,"ph":1},{"name":"Asad","codes":["O","Mt","Es","Nr","O","Mt","Es","Es","Nr","O","O","Mt","Mr","Nt","O","O","Mt","Er","Es","Nr","O","O","Es","Es","Nt","O","O","Es"],"po":5,"ph":5},{"name":"Wathik","codes":["O","Er","Nt","O","Es","Es","Nr","O","O","Mr","Mt","Es","Nt","O","O","Mt","Es","Es","Nt","O","O","O","Mt","O","Es","Nr","O","Mr"],"po":7,"ph":4},{"name":"Mosaab","codes":["Nr","O","O","Es","Et","Nt","O","O","Er","Es","Nt","O","Es","Er","Nr","O","Oc","Mc","Er","Es","Nc","O","O","O","Er","Es","Nt","O"],"po":8,"ph":18},{"name":"Yousif","codes":["Mt","Es","Nr","O","Oc","Oc","Oc","O","Mt","Ec","Et","Nr","O","Ec","O","Mr","Et","E","Nr","O","O","Et","Er","Nt","O","O","Mt","Er"],"po":4,"ph":7},{"name":"Samad","codes":["L","L","L","L","L","O","O","Er","Es","Et","Nr","O","Oc","Es","Er","Nr","O","O","Mr","Mt","Es","Nt","O","Oc","Mt","Et","Es","Nr"],"po":3,"ph":0},{"name":"Mohammed R","codes":["Es","Nr","O","O","Mr","Mr","Nt","O","Oc","Mt","Ec","Nt","O","Oc","O","Es","Er","Nt","O","O","Mt","Mt","Nr","O","O","Ec","Er","Et"],"po":2,"ph":15},{"name":"Rihab","codes":["L","L","L","L","L","O","O","Nt","O","O","Er","Et","Nr","O","Oc","Er","Ec","Nr","O","O","Ec","Er","Nt","O","Oc","Mt","Mr","Nt"],"po":1,"ph":17},{"name":"Ahmed Radhi","codes":["L","L","L","L","L","O","O","Nr","O","O","Mr","Ec","Er","Nr","O","Oc","Mr","Ec","Ec","Nc","O","Oc","Mc","Mr","E","N","O","Mc"],"po":6,"ph":13},{"name":"Sermad","codes":["Nc","O","O","O","Er","Nr","O","Oc","Mr","Er","E","Nc","O","Mc","Mc","Ec","Nc","O","O","O","Mr","Mr","E","Nc","O","O","E","Nc"],"po":2,"ph":0},{"name":"Jameel","codes":["-","-","-","-","-","-","-","M","M","M","M","M","O","O","M","E","E","E","O","O","E","E","E","N","O","Oc","E","E"],"po":3,"ph":0},{"name":"Emaan","codes":["O","O","Mt","Mt","Nc","O","Mt","Mt","Ec","Nt","O","Oc","Et","Et","Nt","O","O","Mt","Mc","Nt","O","O","Et","Ec","N","O","Oc","Mt"],"po":7,"ph":12},{"name":"Nancy","codes":["O","O","Er","Er","Nr","O","Mc","Ec","E","Nr","O","O","Mc","Mr","Ec","Nc","O","O","Et","Ec","Nr","O","Oc","Mt","E","Nc","O","O"],"po":3,"ph":11},{"name":"Marwa","codes":["L","L","L","L","L","L","L","L","L","L","L","L","O","O","E","Et","Nr","O","Oc","Mr","Et","Nr","O","O","Mc","Er","Nr","O"],"po":2,"ph":13},{"name":"Esra","codes":["O","Mr","Ec","Nt","O","Er","Er","Nc","O","Oc","Mc","Er","Nc","O","O","Mc","E","Nc","O","Oc","Er","Ec","Ec","Nr","O","O","Et","E"],"po":2,"ph":6},{"name":"Manjit","codes":["Ec","Et","Nc","O","P/O","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"],"po":6,"ph":18},{"name":"Leena","codes":["Er","Ec","O","Oc","O","Mc","Mr","P/O","P/O","P/O","P/O","PH","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L"],"po":0,"ph":6},{"name":"Zaid","codes":["O","O","Et","Et","Nt","O","Et","Et","Et","Nc","O","O","Mt","Mt","Et","Nt","O","Oc","Mt","Et","Nt","O","O","Et","Et","Nt","O","Oc"],"po":1,"ph":10},{"name":"Mohd Ibrahim","codes":["O","Oc","E","Ec","Ec","Nc","O","O","Mc","E","Nc","O","E","E","Nc","O","O","N","O","Mc","Mc","Nc","O","O","E","E","Nc","O"],"po":3,"ph":5},{"name":"Farhat","codes":["Nt","O","O","M","Mt","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","-","-","-","-","-","-"],"po":0,"ph":0},{"name":"Shameema","codes":["Et","Nt","O","PH","PH","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"],"po":0,"ph":7},{"name":"Waddhah","codes":["Oc","Mc","Mc","Nc","O","Et","Ec","E","Nc","O","Oc","Mc","Ec","Nc","O","O","O","M","Nc","O","Oc","C","C","E","Nc","O","Ec","Ec"],"po":4,"ph":8},{"name":"Farah","codes":["PH","PH","PH","P/O","P/O","O","O","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"],"po":0,"ph":0},{"name":"Yara","codes":["O","O","Oc","E","E","E","N","O","O","M","E","N","O","E","E","E","N","O","O","E","E","N","O","O","M","E","N","O"],"po":1,"ph":0},{"name":"Salim Al Adawi","codes":["E","Nc","O","P/O","P/O","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"],"po":0,"ph":2},{"name":"Ahmed","codes":["O","E","E","Mc","Mc","Ec","Nc","O","O","E","N","O","O","O","L","L","L","L","L","O","O","O","N","O","O","Mc","Mc","N"],"po":null,"ph":null},{"name":"Raheela","codes":["ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML"],"po":0,"ph":6}],"residents":[{"name":"Suad","grade":"R5 EM","codes":["O","M","M","C","E","N","O","E","E","O","C","M","O","O","N","O","M","C","E","N","O","M","Mr","O","C","M","O","O"],"fullName":"Suad Al Shuraiqi","note":""},{"name":"Marwa","grade":"R3 EM","codes":["E","N","O","C","M","M","E","N","O","M","C","M","O","O","O","N","O","C","E","E","N","O","M","M","C","M","O","O"],"fullName":"Marwa Al Ghadani","note":""},{"name":"Maryam","grade":"R2 EM","codes":["M","E","O","C","N","O","M","M","N","O","C","E","N","O","M","M","M","C","M","O","O","E","N","O","C","M","O","O"],"fullName":"Maryam Al Balushi","note":""},{"name":"Salim","grade":"R1 FAMCO","codes":["M","C","E","N","O","O","O","M","C","N","O","E","E","N","O","C","O","E","N","O","M","M","C","E","O","O","O","O"],"fullName":"Salim Al-Mamari","note":""},{"name":"Abdulrahman","grade":"R2 OMFS","codes":["M","M","M","M","M","O","O","E","E","E","E","E","O","O","-","-","-","-","-","-","-","-","-","-","-","-","-","-"],"fullName":"Abdulrahman Al Mamari","note":"First 2 weeks only (25 Oct – 7 Nov)"}],"interns":[{"name":"Faisal","codes":["N","O","O","E","E","O","E","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Samar","codes":["E","E","N","O","O","E","O","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]}],"famcoWeekend":2,"changes":[],"rotators":{"source":"OMSB EM programme email of 10 Sep 2026: EM KH 2026_27 with ANES, FAMCO, RADIO, ORTHO, OBGYN & OMFS (LATEST); FM weekend sheet of 22 Oct 2026; OMFS didactic change of 25 Oct 2026; EM Space Site Leaves read 3 Nov 2026; Updated EM KH Resident Roster of 4 Nov 2026 (Fatema Al Balushi, R1 anaesthesia, Blocks 4–5)","blocks":[{"n":1,"start":"2026-09-01","end":"2026-09-26","label":"1 Sep – 26 Sep 2026"},{"n":2,"start":"2026-09-27","end":"2026-10-24","label":"27 Sep – 24 Oct 2026"},{"n":3,"start":"2026-10-25","end":"2026-11-21","label":"25 Oct – 21 Nov 2026"},{"n":4,"start":"2026-11-22","end":"2026-12-19","label":"22 Nov – 19 Dec 2026"},{"n":5,"start":"2026-12-20","end":"2027-01-16","label":"20 Dec 2026 – 16 Jan 2027"},{"n":6,"start":"2027-01-17","end":"2027-02-13","label":"17 Jan – 13 Feb 2027"},{"n":7,"start":"2027-02-14","end":"2027-03-13","label":"14 Feb – 13 Mar 2027"},{"n":8,"start":"2027-03-14","end":"2027-04-10","label":"14 Mar – 10 Apr 2027"},{"n":9,"start":"2027-04-11","end":"2027-05-08","label":"11 Apr – 8 May 2027"},{"n":10,"start":"2027-05-09","end":"2027-06-05","label":"9 May – 5 Jun 2027"},{"n":11,"start":"2027-06-06","end":"2027-07-03","label":"6 Jun – 3 Jul 2027"},{"n":12,"start":"2027-07-04","end":"2027-07-31","label":"4 Jul – 31 Jul 2027"},{"n":13,"start":"2027-08-01","end":"2027-08-31","label":"1 Aug – 31 Aug 2027"}],"programmes":[{"key":"EM","name":"Emergency Medicine (OMSB)","release":"Wednesday 8 AM – 1 PM (academic half-day)"},{"key":"FM","name":"Family Medicine (FAMCO)","release":"R1 Monday, R2 Wednesday, R3 Tuesday, 8 AM – 4 PM"},{"key":"RAD","name":"Radiology","release":"Monday to Thursday"},{"key":"ANES","name":"Anaesthesia","release":"Sunday 1:30 – 4 PM"},{"key":"ORTHO","name":"Orthopaedics","release":"Tuesday 2 – 5 PM"},{"key":"OMFS","name":"Oral & Maxillofacial Surgery","release":"Monday 7 – 11 AM didactic (moved from Sunday on 25 Oct 2026); Thursday journal club 7:30 – 8:30 AM"},{"key":"OBGYN","name":"Obstetrics & Gynaecology","release":""}],"rotators":[{"prog":"EM","name":"Amani Al Kalbani","level":"R4","block":1},{"prog":"EM","name":"Jihan Al Balushi","level":"R3","block":1},{"prog":"EM","name":"Jihan Al Balushi","level":"R3","block":2},{"prog":"EM","name":"Ghaliya Al Noofli","level":"R4","block":2},{"prog":"EM","name":"Asma Al Maamari","level":"R2","block":2},{"prog":"EM","name":"Suad Al Shuraiqi","level":"R5","block":3},{"prog":"EM","name":"Marwa Al Ghadani","level":"R3","block":3},{"prog":"EM","name":"Maryam Al Balushi","level":"R2","block":3},{"prog":"EM","name":"Manar Al Shahi","level":"R4","block":4},{"prog":"EM","name":"Marwa Al Ghadani","level":"R3","block":4},{"prog":"EM","name":"Saleh Al Maskari","level":"R2","block":4},{"prog":"EM","name":"Fatin Al Omairi","level":"R5","block":5,"note":"EM Space master rota; not in the 10 Sep posting file (Blocks 2–4 only)"},{"prog":"EM","name":"Khatar Al Awaimri","level":"R4","block":5,"note":"EM Space master rota"},{"prog":"EM","name":"Sara Al Habsi","level":"R2","block":5,"note":"EM Space master rota"},{"prog":"EM","name":"Fatin Al Omairi","level":"R5","block":6,"note":"EM Space master rota"},{"prog":"EM","name":"Khatar Al Awaimri","level":"R4","block":6,"note":"EM Space master rota"},{"prog":"EM","name":"Fatema Al Muharrami","level":"R4","block":6,"note":"EM Space master rota"},{"prog":"EM","name":"Zainab Al Maimani","level":"R5","block":7,"note":"EM Space master rota"},{"prog":"EM","name":"Amira Al Qannubi","level":"R3","block":7,"note":"EM Space master rota"},{"prog":"EM","name":"Zainab Al Maimani","level":"R5","block":8,"note":"EM Space master rota"},{"prog":"EM","name":"Mohammed Al Ajmi","level":"R4","block":8,"note":"EM Space master rota"},{"prog":"EM","name":"Al Mahanad Al Julandani","level":"R3","block":9,"note":"EM Space master rota"},{"prog":"EM","name":"Rasha Al Abri","level":"R2","block":11,"note":"EM Space master rota"},{"prog":"EM","name":"Asma Al Maamari","level":"R2","block":11,"note":"EM Space master rota"},{"prog":"EM","name":"Abdulrahman Al Mirza","level":"R3","block":12,"note":"EM Space master rota"},{"prog":"EM","name":"Rasha Al Abri","level":"R2","block":12,"note":"EM Space master rota"},{"prog":"EM","name":"Wegdan Al Rashdi","level":"R4","block":13,"note":"EM Space master rota"},{"prog":"FM","name":"Iman Al Harrasi","level":"R1","block":2},{"prog":"FM","name":"Salim Al-Mamari","level":"R1","block":3},{"prog":"FM","name":"Kothar Al Sakiti","level":"R1","block":5},{"prog":"FM","name":"Al Safaa Al Maamari","level":"R1","block":6},{"prog":"RAD","name":"Samah Al-Zeheimi","level":"R2","block":2},{"prog":"ORTHO","name":"Al Munqith Al-Abri","level":"R1","block":1},{"prog":"ORTHO","name":"Yahya Al Kindi","level":"R1","block":2},{"prog":"ORTHO","name":"Al-Muaayad Al-Abri","level":"R1","block":5},{"prog":"ORTHO","name":"Issam Al-Aghbari","level":"R1","block":6},{"prog":"ORTHO","name":"Osama Al-Senani","level":"R1","block":9},{"prog":"ORTHO","name":"Firas Al Majrafi","level":"R1","block":10},{"prog":"ORTHO","name":"Haitham Al Jadidi","level":"R1","block":12},{"prog":"ORTHO","name":"Ahmed Al-Ghaithi","level":"R1","block":13},{"prog":"OMFS","name":"Abdullah Al Ismaili","level":"R2","block":1,"note":"First 2 weeks only"},{"prog":"OMFS","name":"Reem Al Mufarraji","level":"R2","block":2,"note":"First 2 weeks only"},{"prog":"OMFS","name":"Abdulrahman Al Mamari","level":"R2","block":3,"note":"First 2 weeks only"},{"prog":"OMFS","name":"Razan Al Hajri","level":"R2","block":7,"note":"First 2 weeks only"},{"prog":"ANES","name":"Fatema Al Balushi","level":"R1","block":4,"note":"Added by the OMSB EM programme on 4 Nov 2026 (Updated EM KH Resident Roster): Blocks 4 and 5; released every Sunday 1:30–4 PM"},{"prog":"ANES","name":"Fatema Al Balushi","level":"R1","block":5,"note":"Added by the OMSB EM programme on 4 Nov 2026 (Updated EM KH Resident Roster): Blocks 4 and 5; released every Sunday 1:30–4 PM"}],"khLeave":[{"name":"Amani Al Kalbani","level":"R4","type":"Annual leave","from":"2026-09-01","to":"2026-09-07","block":1},{"name":"Saleh Al Maskari","level":"R2","type":"Annual leave","from":"2026-11-22","to":"2026-11-28","block":4},{"name":"Manar Al Shahi","level":"R4","type":"Annual leave","from":"2026-11-22","to":"2026-11-28","block":4},{"name":"Asma Al Maamari","level":"R2","type":"Annual leave","from":"2027-06-13","to":"2027-06-19","block":11},{"name":"Rasha Al Abri","level":"R2","type":"Annual leave","from":"2027-06-13","to":"2027-06-19","block":11},{"name":"Rasha Al Abri","level":"R2","type":"Annual leave","from":"2027-07-25","to":"2027-07-31","block":12}],"famcoWeekend":{"2026-10-30":["Buthaina Al-Harthi","Shahad Al Omrani"],"2026-10-31":["Buthaina Al-Harthi","Shahad Al Omrani"],"2026-11-06":["Basma Al Badi","Hanadi Al-Maqbali"],"2026-11-07":["Basma Al Badi","Hanadi Al-Maqbali"],"2026-11-08":["Al Mahalab Al Farsi (undated row)"],"2026-11-13":["Suaad Al Mandhari","Saniha Hameed Allah"],"2026-11-14":["Suaad Al Mandhari","Saniha Hameed Allah"],"2026-11-20":["Al Mahalab Al Farsi","Ayman Al Kharusi"],"2026-11-21":["Al Mahalab Al Farsi","Ayman Al Kharusi"]},"famcoWeekendNote":"Family Medicine R4 residents cover the KH ED morning shift (7 AM – 3 PM) on Fridays and Saturdays; names from the FM programme's Block 3 weekend sheet (22 Oct 2026).","events":[{"date":"2026-11-05","who":"Salim Al-Mamari (FM R1)","what":"Released 11:45 AM – 12:45 PM for the FM site-visit resident interview (Zoom)"}],"contacts":{},"contactsNote":"Contact numbers are not shown on the website; they are on the rota maker's page."},"staffContacts":{},"leaveSheet":{"id":"1vx_8gzdRoaj6qwuB1cFqZIu5Md3fnSMT8EIpxJGMYqU","url":"https://docs.google.com/spreadsheets/d/1vx_8gzdRoaj6qwuB1cFqZIu5Md3fnSMT8EIpxJGMYqU/edit"},"previous":[{"block":{"label":"Block 2","year":"AY 2026","start":"2026-09-27","days":28,"hospital":"Khoula Hospital","dept":"Emergency Department","checkedBy":"Dr. Khalifa Al-Yousfi","createdBy":"Dr. Isra Al Lawati"},"thirdOnCall":["Khalifa","Salim","Khalifa","Asad"],"changes":0,"staff":[{"name":"Khalifa (HOD)","codes":["M","M","M","M","M","O","O","M","M","M","M","M","O","O","M","M","M","M","M","O","O","M","M","M","M","M","O","O"]},{"name":"Isra","codes":["Mr","C","C","Mt","O","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Salim","codes":["C","C","O","M","C","O","C","Mc","Mc","Es","Es","O","O","O","C","C","M*","Mc","O","C","C","C","C","C","C","C","C","C"]},{"name":"Duaa","codes":["Er","C","C","C","O","Mr","O","O","C","O","O","Mt","O","O","C","C","C","C","C","O","O","C","C","C","C","O","O","O"]},{"name":"Bushra","codes":["L","L","L","L","L","O","O","M","PM","M","PM","PM","O","O","Mc","PM","M","PM","PM","O","O","Mc","PM","Mc","PM","PM","O","O"]},{"name":"Asad","codes":["L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","O","O","Es","Nr","O","O","Mr","Nr","O"]},{"name":"Wathik","codes":["Mt","Es","Nr","O","O","Mt","Es","Nr","O","O","Mr","Es","Nt","O","O","Mr","Es","Es","Nr","O","O","Mt","Es","Er","Nr","O","Mr","O"]},{"name":"Mosaab","codes":["Nr","O","O","Nr","O","O","Er","Es","Nt","O","O","Mr","Es","Nr","O","Oc","Mc","Er","Es","Nr","O","O","Mt","Es","Er","Nt","O","Es"]},{"name":"Yousif","codes":["Es","Nr","O","Oc","Mr","Es","Nt","O","O","Mr","Et","Nr","O","O","Es","Es","Nr","O","O","Mr","Es","Nr","O","O","Es","Es","Es","O"]},{"name":"Samad","codes":["O","Mr","Es","Er","Nr","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Mohammed R","codes":["O","O","Mr","Es","Es","Nr","O","O","Es","Er","Nr","O","O","Es","Nr","O","Oc","Mt","Mr","Es","Nt","O","O","Mr","Mt","Nr","O","Mr"]},{"name":"Rihab","codes":["O","Er","Nc","O","Oc","O","Mr","Er","Ec","Nr","P/O","P/O","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Ahmed Radhi","codes":["P/O","P/O","P/O","P/O","P/O","O","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Sermad","codes":["Ec","Nc","O","O","O","O","M","Ec","Nc","O","Oc","O","Mc","M","Er","Nc","O","P/O","Ec","O","O","Mr","Er","Nc","P/O","Oc","C","Er"]},{"name":"Emaan","codes":["L","L","L","L","L","O","O","Mt","Mt","Et","Nc","O","O","Mc","Oc","Et","Nc","O","O","Mt","Ec","Ec","Nt","O","Oc","Mc","Mt","N"]},{"name":"Nancy","codes":["O","C","C","Mc","Nt","O","Oc","O","Mr","Ec","Ec","Nt","O","O","Mr","Er","Ec","Nt","O","O","Mc","Er","O","Nr","O","O","Er","Nr"]},{"name":"Marwa","codes":["E","Nt","O","O","Ec","Er","Nr","O","O","Mc","Er","Ec","Nr","O","O","Mc","Er","Nr","O","O","Mr","E","Ec","O","P/O","P/O","O","O"]},{"name":"Esra","codes":["O","Mt","O","P/O","P/O","Oc","E","E","Nr","O","O","O","Mr","Mr","Ec","Nr","O","O","Mt","Et","Er","Nt","O","Oc","Mr","Er","Nt","O"]},{"name":"Manjit","codes":["Nc","O","O","Mr","Er","Ec","Nc","O","Oc","O","Mc","Er","Er","Nc","O","O","Mr","Ec","Er","Nt","O","O","Mr","Ec","Nc","O","O","Ec"]},{"name":"Leena","codes":["O","O","Er","Ec","Nc","O","O","Mr","Er","Nc","O","O","Et","Er","Nt","O","O","Mr","Et","Er","Nr","O","P/O","P/O","P/O","P/O","O","O"]},{"name":"Zaid","codes":["Et","Et","Nt","O","O","O","Mt","Et","E","Nt","O","Oc","O","Mt","Mt","Ec","Nt","O","O","O","Mt","Et","Oc","Nt","O","P/O","Et","Nt"]},{"name":"Mohd Ibrahim","codes":["O","Mc","Ec","Nc","O","O","O","O","O","O","P/O","P/O","Ec","Ec","E","N","O","Oc","Mc","Ec","Ec","Nc","O","O","Mc","Et","Ec","Nc"]},{"name":"Farhat","codes":["M","E","Et","Nt","O","O","Mc","Oc","Et","P/O","Nt","O","Oc","Et","Et","Nt","O","O","O","Mc","E","O","Nc","O","O","Mt","E","Et"]},{"name":"Shameema","codes":["Nt","O","Oc","O","Mt","Et","Et","Nt","O","PH","PH","M","Mt","Nt","O","O","Et","E","Nc","O","O","O","Et","Et","Nt","O","Oc","Mt"]},{"name":"Waddhah","codes":["Mc","Ec","E","O","O","Mc","Ec","Nc","O","Oc","O","Mc","O","E","Nc","O","P/O","P/O","Oc","E","Nc","O","O","Mt","Et","Ec","Nc","O"]},{"name":"Farah","codes":["O","Oc","Mt","Et","Et","Nt","O","O","O","Mt","Mt","Et","Nc","O","O","Mt","Mt","Et","Nt","O","Oc","M","Mc","O","Ec","E","O","Mc"]},{"name":"Yara","codes":["N","O","O","M","M","E","N","O","O","O","M","E","E","O","O","C","C","M","E","N","O","Oc","M","E","E","N","O","Oc"]},{"name":"Salim Al Adawi","codes":["Oc","O","M","E","E","N","O","O","M","E","E","N","O","Oc","O","E","E","N","O","Oc","M","P/O","E","N","O","O","M","E"]},{"name":"Raheela","codes":["ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML"]}],"residents":[{"name":"Ghaliya","grade":"R4 EM","codes":["M","E","O","C/N","O","M","M","M","M","O","C/N","O","O","O","E","E","O","C/N","O","M","E","E","N","O","C","O","O","O"]},{"name":"Jihan","grade":"R3 EM","codes":["O","M","M","C","M","O","O","N","O","M","C","E","N","O","M","M","M","C","C","N","O","E","E","E","C","M","O","O"]},{"name":"Asma","grade":"R2 EM","codes":["O","M","M","C","M","O","O","E","N","O","C","M","M","E","N","O","M","C","M","O","O","N","O","M","C","E","E","E"]},{"name":"Samah","grade":"R2 Rad","codes":["M","C","O","C","N","O","E","E","E","N","O","E","E","E","O","N","O","M","M","O","O","M","M","M","M","O","O","O"]},{"name":"Iman","grade":"R2 FAMCO","codes":["E","N","O","C","E","E","O","O","M","M","C","O","O","O","N","O","M","C","O","O","O","M","E","O","C","E","N","O"]},{"name":"Yahya","grade":"R1 Ortho","codes":["E","E","C/N","O","O","O","O","M","E","C","E","N","O","M","M","E","C/N","O","E","E","E","N","O","C","M","O","O","O"]},{"name":"Reem","grade":"R2 OMFS","codes":["M","M","M","M","M","O","O","E","E","E","E","E","O","O","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]}],"interns":[{"name":"Faisal","grade":"","codes":["N","O","O","M","E","N","O","O","P/O","E","E","N","O","O","M","M","E","E","N","O","O","O","M","E","N","O","O","M"]},{"name":"Samar","grade":"","codes":["O","M","E","E","O","M","E","N","O","O","M","M","E","N","O","O","O","P/O","E","E","N","O","O","M","E","N","O","O"]}],"famcoWeekend":["","","","","","1","1","","","","","","2","2","","","","","","2","2","","","","","","2","2"]},{"block":{"label":"Block 1","year":"AY 2026","start":"2026-08-30","days":28,"hospital":"Khoula Hospital","dept":"Emergency Department","checkedBy":"Dr. Khalifa Al-Yousfi","createdBy":"Dr. Isra Al Lawati","note":"Block 1 runs 1–26 Sep 2026; the sheet also shows Sun 30 and Mon 31 Aug (the last two days of the block before it)"},"thirdOnCall":["Asad","Isra","Duaa","Khalifa"],"changes":0,"staff":[{"name":"Khalifa (HOD)","codes":["L","L","L","L","L","L","L","L","L","L","L","L","O","O","M","M","M","M","M","O","O","M","M","M","M","M","O","O"]},{"name":"Ibtisam","codes":["L","L","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Isra","codes":["M","M","M","M","M","O","O","M","M","M","M","M","O","O","Mt","M*","Er","O","C","Nc","Nr","O","O","Es","M*","O","O","O"]},{"name":"Salim","codes":["C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","C"]},{"name":"Duaa","codes":["O","O","L","L","L","O","O","E","C","M*","M","Mr","O","O","O","PH","Et","O","Mt","Nr","O","Mr","C","Nt","O","O","O","O"]},{"name":"Bushra","codes":["L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Asad","codes":["O","Es","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Wathik","codes":["Mt","Et","Nt","O","O","Mr","Et","Nr","O","O","Mr","Et","Nt","O","O","Mr","Mt","Et","Nc","O","O","O","Mt","Er","O","Nr","O","O"]},{"name":"Mosaab","codes":["Es","Nr","O","Et","Er","Nt","O","O","Mt","Et","Nr","O","Oc","Mt","Er","Nr","O","O","O","Er","Nt","O","O","Mr","Es","O","Mr","Es"]},{"name":"Yousif","codes":["O","Mt","Et","Nr","O","O","Mt","Er","Nt","O","Et","Er","Ec","Nr","O","Oc","O","Er","Nr","O","O","Es","Er","O","N","O","O","Mt"]},{"name":"Samad","codes":["O","O","O","O","PH","O","O","PH","PH","PH","PH","P/O","O","O","P/O","P/O","P/O","P/O","Mr","Mt","Er","Nr","O","Mt","Mt","Es","Nr","O"]},{"name":"Mohammed R","codes":["P/O","P/O","PH","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","O","O","Mt","Es","Nr","O","O","Es","Nt"]},{"name":"Rihab","codes":["O","Oc","Mr","Er","Nt","O","O","Mt","Er","Nc","O","O","Et","Er","Nr","O","Nr","O","E","Et","Oc","Nt","O","O","Er","Nt","O","O"]},{"name":"Ahmed Radhi","codes":["Mr","Nc","O","Oc","Mr","Ec","Nr","O","O","Mc","Ec","Nr","O","O","Et","Et","O","Nc","O","O","Mt","Et","Nr","O","Oc","Mr","Er","Et"]},{"name":"Sermad","codes":["PH","M","Ec","Nc","O","Oc","Ec","E","Nc","O","O","Mc","E","Nc","O","O","M","Ec","N","O","O","Oc","Ec","E","Nc","O","O","Ec"]},{"name":"Emaan","codes":["L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L"]},{"name":"Nancy","codes":["Nr","O","O","Mt","Et","Nr","O","Oc","Mr","Er","Nt","O","O","Mr","Ec","Nt","O","Oc","Mc","Ec","Et","O","O","O","Mr","Er","Nt","O"]},{"name":"Marwa","codes":["O","Nt","O","O","Mt","Er","Nt","O","Oc","Mt","Er","Nt","O","O","Mr","Er","Nt","O","Oc","O","O","P/O","Mr","Ec","Nr","O","O","Mr"]},{"name":"Esra","codes":["O","Mr","Er","Nt","O","O","O","Mr","Ec","Nr","O","Oc","Mr","Ec","O","SL","SL","Mr","O","Mr","Ec","Er","Nt","O","O","Mt","Et","O"]},{"name":"Manjit","codes":["Er","O","Mt","Mr","Nr","O","Er","E","Nr","O","Oc","Mt","Er","Nt","O","O","Mc","E","Nt","O","O","M","Et","Nc","O","O","Mc","Er"]},{"name":"Leena","codes":["Ec","Er","Nr","O","O","Mt","Mr","Nc","O","Oc","Mc","Ec","Nr","O","O","Mc","Ec","Nr","O","O","Mr","Ec","Oc","O","Et","Et","O","Nr"]},{"name":"Zaid","codes":["L","L","L","L","L","O","O","Et","Et","Nt","O","O","Mt","Et","Nt","O","Oc","Mt","Et","Nt","O","O","Mc","Et","Nt","O","Oc","Mc"]},{"name":"Mohd Ibrahim","codes":["E","O","E","E","Nc","O","Oc","Mc","E","Ec","Nc","O","O","Mc","E","Nc","O","O","E","E","N","O","O","Oc","Mc","Ec","Nc","O"]},{"name":"Farhat","codes":["Nt","O","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","O","O"]},{"name":"Shameema","codes":["Et","Ec","Nc","O","Oc","Et","E","Nt","O","O","Mt","E","Nc","O","Oc","Mt","E","Nt","O","O","O","O","O","O","P/O","PH","Mt","M"]},{"name":"Waddhah","codes":["Nc","O","Oc","Ec","Ec","Nc","O","Ec","O","E","E","O","Mc","E","Nc","O","O","Mc","Ec","E","Nc","O","O","Mc","Ec","Nc","O","Oc"]},{"name":"Farah","codes":["O","O","Mc","Mc","Mc","Mc","E","O","P/O","P/O","P/O","P/O","O","O","Mc","Ec","E","O","O","Mc","E","E","N","O","O","Mc","Ec","Nc"]},{"name":"Yara","codes":["M","N","O","O","E","E","N","O","O","O","O","O","Oc","N","O","E","E","N","O","O","M","M","N","O","O","Oc","E","E"]},{"name":"Salim Al Adawi","codes":["Oc","M","E","N","O","O","M","O","M","E","E","N","O","Oc","E","E","N","O","O","Oc","E","N","O","O","E","E","N","O"]},{"name":"Raheela","codes":["ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML","ML"]}],"residents":[{"name":"Amani","grade":"R4 EM","codes":["-","-","L","L","L","L","L","L","L","Mr","C","N","O","M","C","C","Mr","C","Er","E","E","E","M","M","C","M","O","N"]},{"name":"Jihan","grade":"R3 EM","codes":["-","-","M","C","E","E","N","O","M","M","C","M","O","O","N","O","C","C","M","O","O","N","O","M","C","E","E","E"]},{"name":"Al Munqith","grade":"R1 Ortho","codes":["-","-","C/N","O","E","E","E","N","O","C","O","O","O","O","M","M","C","E","E","N","O","E","E","C","M","M","O","O"]},{"name":"Abdullah","grade":"R2 OMFS","codes":["-","-","M","M","M","O","O","M","E","E","E","E","O","O","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Manar","grade":"R3 EM","codes":["C","E","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Amira","grade":"R2 EM","codes":["M","E","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Aisha","grade":"R1 Rad","codes":["L","L","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Wafa","grade":"R1 Rad","codes":["M","M","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]}],"interns":[{"name":"Faisal","grade":"","codes":["-","-","E","E","N","O","O","M","N","O","O","E","E","E","O","N","O","M","M","O","O","O","M","N","O","O","M","E"]},{"name":"Samar","grade":"","codes":["-","-","O","M","M","N","O","O","E","N","O","O","O","E","E","E","N","O","O","M","M","M","E","O","E","N","O","O"]},{"name":"Mohammed","grade":"","codes":["O","PH","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Rawan","grade":"","codes":["N","PH","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]},{"name":"Al Annod","grade":"","codes":["E","PH","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"]}],"famcoWeekend":["","","","","","1","2","","","","","","2","2","","","","","","1","2","","","","","","2","2"]}],"leave":{"updated":"7 Nov 2026","entries":[{"id":"isra-l1","name":"Isra","from":"2026-10-25","to":"2026-11-05","status":"approved","note":"Block 3 roster"},{"id":"salimaa-l1","name":"Salim Al Adawi","from":"2026-11-01","to":"2026-11-26","status":"approved","note":""},{"id":"shameema-l1","name":"Shameema","from":"2026-11-01","to":"2026-11-28","status":"approved","note":"First shift Sun 29 Nov"},{"id":"manjit-l1","name":"Manjit","from":"2026-11-01","to":"2026-12-10","status":"approved","note":"First shift Sun 13 Dec"},{"id":"leena-l1","name":"Leena","from":"2026-11-08","to":"2026-11-26","status":"approved","note":"First shift Sun 29 Nov"},{"id":"raheela-l1","name":"Raheela","from":"2026-10-25","to":"2026-11-21","status":"approved","note":"Maternity leave; back 22 Nov"},{"id":"nancy-l1","name":"Nancy","from":"2026-11-29","to":"2026-12-17","status":"approved","note":""},{"id":"esra-l1","name":"Esra","from":"2026-11-29","to":"2026-12-24","status":"approved","note":""},{"id":"mohdi-l1","name":"Mohd Ibrahim","from":"2026-12-05","to":"2026-12-06","status":"approved","note":""},{"id":"yousif-l1","name":"Yousif","from":"2026-12-13","to":"2027-01-07","status":"approved","note":""},{"id":"marwa-l1","name":"Marwa","from":"2026-12-13","to":"2026-12-31","status":"approved","note":""},{"id":"lmw622k7ggz97","name":"Isra","from":"2027-06-27","to":"2027-07-15","status":"requested","note":""}],"note":"Annual leave only (approved and requested). Zaid's leave is not confirmed yet and is not shown. Residents are not listed (their leave is on EM Space). PH / P-O days, days off and courses are requested on the ED Roster Requests sheet and shown on the block rosters."},"siteUrl":"https://khoula-ed.github.io/Schedule-Leave/","mirror":{"updated":"7 Nov 2026, 12:58 (Muscat)","note":"Read-only copy of the roster page, refreshed every hour. Changes and leave are approved by the rota maker on the roster page."}};
+  const CHANGES = Array.isArray(DATA.changes) ? DATA.changes : [];
+  // Colour flags for EM duty-hours policy breaches: switched on per block (DATA.policyFlags). Block 3 was issued before the checks and is not being changed.
+  const POLICY_FLAGS = DATA.policyFlags === true;
+
+  // ---------- dates ----------
+  const start = new Date(DATA.block.start + 'T00:00:00Z');
+  const N = DATA.block.days;
+  const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const DOWL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const days = [];
+  for (let i = 0; i < N; i++) {
+    const d = new Date(start.getTime() + i * 86400000);
+    const iso = d.toISOString().slice(0, 10);
+    const dow = d.getUTCDay();
+    days.push({ i, iso, dow, dnum: d.getUTCDate(), mon: d.getUTCMonth(), year: d.getUTCFullYear(),
+      weekend: dow === 5 || dow === 6, week: Math.floor(i / 7) });
+  }
+  const shortDate = d => DOW[d.dow] + ' ' + d.dnum + ' ' + MON[d.mon];
+  function todayIso() {
+    try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Muscat', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
+    catch (e) { return new Date().toISOString().slice(0, 10); }
+  }
+  const TODAY = todayIso();
+  const todayIdx = days.findIndex(d => d.iso === TODAY);
+  const first = days[0], last = days[N - 1];
+  // PH / P-O tally: DATA.block.tally = { carriedFrom, phCredit, publicHolidays: [iso dates], holidayName }.
+  // Balances carried from the previous block are in each staff row's po/ph; the block's public holidays add
+  // phCredit to everyone working this block (or the row's own phCredit), and PH / P/O days on the roster are deducted.
+  const TALLY = DATA.block.tally || null;
+  const PH_DAYS = new Set((TALLY && TALLY.publicHolidays) || []);
+  days.forEach(d => { d.ph = PH_DAYS.has(d.iso); });
+  function tallyFor(p) {
+    if (!TALLY || p.group !== 'staff' || p.noTally) return null;
+    let phGiven = 0, poGiven = 0, off = 0, shifts = 0;
+    p.codes.forEach(c => {
+      if (c === 'PH') phGiven++; else if (c === 'P/O') poGiven++;
+      const q = parse(c);
+      if (q.kind === 'shift') shifts++;
+      if (['off', 'oc', 'lv'].includes(q.kind)) off++;   // off days: O, on call, leave — a PH or P/O day replaces a worked shift and is not an off day (Isra, 4 Nov 2026)
+    });
+    const credit = (p.phCredit === null || p.phCredit === undefined) ? TALLY.phCredit : p.phCredit;
+    // pending off accrues when a physician gets fewer than 11 off days in the block (Isra, 4 Nov 2026); not for fixed-pattern rows
+    const offTarget = TALLY.offTarget || 11;
+    const poCredit = (p.noPoCredit || !shifts) ? 0 : Math.max(0, offTarget - off);
+    const phStart = p.ph || 0, poStart = p.po || 0;
+    return { phStart, poStart, credit, phGiven, poGiven, off, offTarget, poCredit, phEnd: phStart + credit - phGiven, poEnd: poStart + poCredit - poGiven };
+  }
+  function tallyHtml(t) {
+    const b = n => '<b class="num">' + n + '</b>';
+    return 'PH owed ' + b(t.phEnd) + ': ' + b(t.phStart) + ' carried from ' + escapeHtml(TALLY.carriedFrom) + (t.credit ? ' + ' + b(t.credit) + ' for ' + escapeHtml(TALLY.holidayName) : '') + (t.phGiven ? ' \u2212 ' + b(t.phGiven) + ' given this block' : ', none given this block') + '.<br>' +
+      'P/O owed ' + b(t.poEnd) + ': ' + b(t.poStart) + ' carried' + (t.poCredit ? ' + ' + b(t.poCredit) + ' for only ' + b(t.off) + ' off days this block (' + t.offTarget + ' due)' : '') + (t.poGiven ? ' \u2212 ' + b(t.poGiven) + ' given this block' : ', none given this block') + '.';
+  }
+  function tallyText(t) {
+    return 'PH owed: ' + t.phStart + ' carried from ' + TALLY.carriedFrom + (t.credit ? ' + ' + t.credit + ' for ' + TALLY.holidayName : '') + (t.phGiven ? ' \u2212 ' + t.phGiven + ' given this block' : '') + ' = ' + t.phEnd +
+      ' \u00b7 P/O owed: ' + t.poStart + ' carried' + (t.poCredit ? ' + ' + t.poCredit + ' (' + t.off + ' off days, ' + t.offTarget + ' due)' : '') + (t.poGiven ? ' \u2212 ' + t.poGiven + ' given this block' : '') + ' = ' + t.poEnd;
+  }
+  document.getElementById('blockLabel').textContent =
+    DATA.block.year + ' · ' + DATA.block.label + ' · ' + first.dnum + ' ' + MON[first.mon] + ' – ' + last.dnum + ' ' + MON[last.mon] + ' ' + last.year;
+
+  // ---------- code parsing ----------
+  const ROLE = { r: 'Resus in-charge', s: 'Supervisor', t: 'Triage', c: 'Calls from outside' };
+  function parse(code) {
+    if (!code || code === '-') return { kind: 'none', label: 'No entry' };
+    if (code === 'O') return { kind: 'off', label: 'Off' };
+    if (code === 'L') return { kind: 'lv', label: 'Leave' };
+    if (code === 'ML') return { kind: 'lv', ml: true, label: 'ML' };
+    if (code === 'PH') return { kind: 'ph', label: 'Public holiday' };
+    if (code === 'P/O') return { kind: 'ph', po: true, label: 'Pending off' };
+    if (code === 'PM') return { kind: 'pm', label: 'Pain management' };
+    if (code === 'Oc') return { kind: 'oc', label: 'On call E & N' };
+    if (code === 'C') return { kind: 'c', label: 'Course / teaching' };
+    if (code === 'R') return { kind: 'rel', label: 'Released by the programme' };
+    if (code === 'C/Nt') return { kind: 'shift', shift: 'N', role: 't', course: true, label: 'Course + Night triage' };
+    if (code === 'M*') return { kind: 'admin', role: null, star: true, label: 'Admin morning' };
+    const m = /^([MEN])([rstc]?)$/.exec(code);
+    if (m) {
+      const names = { M: 'Morning', E: 'Evening', N: 'Night' };
+      return { kind: 'shift', shift: m[1], role: m[2] || null, label: names[m[1]] + (m[2] ? ' · ' + ROLE[m[2]] : '') };
+    }
+    return { kind: 'none', label: code };
+  }
+  function cellClass(p) { return p.kind === 'shift' ? p.shift.toLowerCase() : p.kind; }
+  // Working hours (Isra, 7 Nov 2026): every shift is 8 hours; more than 140 hours in the block is flagged in red
+  const HOURS_PER_SHIFT = (DATA.block && DATA.block.hoursPerShift) || 8;
+  const HOURS_MAX = (DATA.block && DATA.block.hoursMax) || 140;
+  const SHIFTS = [
+    { key: 'M', cls: 'm', name: 'Morning', time: '7 AM – 3 PM' },
+    { key: 'E', cls: 'e', name: 'Evening', time: '3 PM – 11 PM' },
+    { key: 'N', cls: 'n', name: 'Night', time: '11 PM – 7 AM' },
+  ];
+  const ROLE_ORDER = { r: 0, s: 1, t: 2, c: 3 };
+  const ALL_CODES = ['M', 'Mr', 'Ms', 'Mt', 'Mc', 'M*', 'E', 'Er', 'Es', 'Et', 'Ec', 'N', 'Nr', 'Ns', 'Nt', 'Nc', 'C/Nt', 'Oc', 'C', 'R', 'PM', 'O', 'L', 'ML', 'PH', 'P/O', '-'];
+
+  // ---------- contacts (residents and rotators) ----------
+  const CONTACTS = (DATA.rotators && DATA.rotators.contacts) || {};
+  const STAFF_CONTACTS = DATA.staffContacts || {};
+  function normName(s) { return String(s || '').toLowerCase().replace(/\(.*?\)/g, ' ').replace(/[^a-z ]/g, ' ').split(/\s+/).filter(x => x && x !== 'al' && x !== 'dr'); }
+  function contactFor(name, p) {
+    if (p && p.group === 'staff') return STAFF_CONTACTS[p.name] || null;
+    if (!name) return null;
+    if (CONTACTS[name]) return CONTACTS[name];
+    const q = normName(name); if (!q.length) return null;
+    const hit = Object.keys(CONTACTS).find(k => { const w = normName(k); return w.length && w[0] === q[0] && w[w.length - 1] === q[q.length - 1]; });
+    return hit ? CONTACTS[hit] : null;
+  }
+  function telHtml(c) {
+    if (!c || !c.phone) return '';
+    const d = String(c.phone).replace(/\D/g, '');
+    return '<a class="tel" href="tel:+968' + d + '" title="Call ' + d + '">' + d.slice(0, 4) + ' ' + d.slice(4) + '</a>';
+  }
+
+  // ---------- people ----------
+  const people = [];
+  DATA.staff.forEach(s => people.push({ group: 'staff', name: s.name, codes: s.codes.slice(), po: s.po, ph: s.ph, phCredit: s.phCredit, noTally: !!s.noTally, noPoCredit: !!s.noPoCredit, hod: /HOD/.test(s.name), display: s.name.replace(/\s*\(HOD\)/, '') }));
+  DATA.residents.forEach(r => people.push({ group: 'resident', name: r.name, grade: r.grade, codes: r.codes.slice(), display: r.name, fullName: r.fullName || r.name, note: r.note || '' }));
+  DATA.interns.forEach(r => people.push({ group: 'intern', name: r.name, grade: 'GFP / Intern', codes: r.codes.slice(), display: r.name }));
+
+  function slugify(s) { return s.toLowerCase().replace(/\(hod\)/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+  const usedSlugs = new Set();
+  people.forEach(p => {
+    const base = p.group === 'resident' ? p.name + ' ' + (p.grade || '').split(' ')[0] : p.name;
+    let slug = slugify(base); let n = 2;
+    while (usedSlugs.has(slug)) { slug = slugify(base) + '-' + (n++); }
+    usedSlugs.add(slug); p.slug = slug; p.changed = {};
+  });
+  const bySlug = slug => people.find(p => p.slug === slug);
+
+  // Requests from the ED Roster Requests sheet that the roster honoured are colour-coded (green ring + tick) on the cells
+  // they shaped; the Changes tab lists every request for the block with whether it was met.
+  const REQS = Array.isArray(DATA.requests) ? DATA.requests : [];
+  people.forEach(p => { p.req = {}; });
+  REQS.forEach(q => {
+    const p = people.find(x => x.name === q.person && (!q.group || x.group === q.group));
+    if (!p || typeof q.day !== 'number' || !q.met) return;
+    p.req[q.day] = q;
+  });
+  const reqLabel = q => 'Request honoured: ' + (q.want === 'O' ? 'day off' : q.want + ' shift') + ' (' + (q.must ? 'must' : 'preferred') + ')' + (q.note ? ' · ' + q.note : '');
+
+  // Apply recorded changes on top of the issued roster, in order.
+  CHANGES.forEach(ch => (ch.items || []).forEach(it => {
+    const p = bySlug(it.slug);
+    if (!p || typeof it.day !== 'number' || it.day < 0 || it.day >= N) return;
+    p.codes[it.day] = it.to;
+    p.changed[it.day] = { from: it.from, at: ch.at, note: ch.note || '' };
+  }));
+
+  // Personal links are built from SITE_URL when set; otherwise from the claude.ai page link inside Claude,
+  // or from this page's own address when hosted as a standalone website.
+  const SITE_URL = '';
+  const ARTIFACT_URL = 'https://claude.ai/artifact/D7Vcc638Z2uxkUCMaFuh7k';
+  // Rota maker's WhatsApp number in international format without + or spaces (e.g. 96891234567). Empty hides the WhatsApp button.
+  const REQUEST_WHATSAPP = '';
+  // Shared sheet where requests for the NEXT block are collected (leave, courses, days off, preferences).
+  const NEXT_BLOCK_REQUESTS_URL = 'https://docs.google.com/spreadsheets/d/1lauEFDNWuVtfPtOiEnO5lNnYnBzCcgO5giYyGD4MfHk/edit';
+  const inFrame = (() => { try { return window.top !== window.self; } catch (e) { return true; } })();
+  const SHARE_URL = SITE_URL || (inFrame ? ARTIFACT_URL : location.href.split('#')[0]);
+
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
+
+  // ---------- state ----------
+  let selected = todayIdx >= 0 ? todayIdx : 0;
+  try {
+    const saved = localStorage.getItem('khoula-ed-b3-day');
+    if (saved !== null && todayIdx < 0) { const n = parseInt(saved, 10); if (n >= 0 && n < N) selected = n; }
+  } catch (e) { /* storage unavailable */ }
+  let selectedPerson = 0;
+  try {
+    const me = localStorage.getItem('khoula-ed-b3-me');
+    const mi = people.findIndex(p => p.slug === me);
+    if (mi >= 0) selectedPerson = mi;
+  } catch (e) { /* storage unavailable */ }
+
+  // ---------- date strip ----------
+  const strip = document.getElementById('strip');
+  function renderStrip() {
+    let html = '';
+    days.forEach(d => {
+      if (d.i > 0 && d.i % 7 === 0) html += '<span class="week-gap" aria-hidden="true"></span>';
+      const cls = ['day-btn', d.weekend ? 'weekend' : '', d.i === todayIdx ? 'today' : '', d.ph ? 'ph' : ''].filter(Boolean).join(' ');
+      html += '<button type="button" class="' + cls + '" data-i="' + d.i + '"' + (d.ph ? ' title="' + escapeHtml(TALLY.holidayName) + '"' : '') + ' aria-pressed="' + (d.i === selected) + '" aria-label="' + DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] + (d.ph ? ', ' + TALLY.holidayName : '') + '">' +
+        '<span class="dow">' + DOW[d.dow] + '</span><span class="dnum num">' + d.dnum + '</span><span class="mon">' + MON[d.mon] + '</span></button>';
+    });
+    strip.innerHTML = html;
+  }
+  strip.addEventListener('click', e => {
+    const b = e.target.closest('.day-btn'); if (!b) return;
+    selectDay(parseInt(b.dataset.i, 10));
+  });
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    if (todayIdx >= 0) selectDay(todayIdx);
+    else { showView('day'); scrollSelectedIntoView(); }
+  });
+  if (todayIdx < 0) document.getElementById('todayBtn').textContent = 'Today is outside this block';
+
+  function scrollSelectedIntoView() {
+    const b = strip.querySelector('.day-btn[aria-pressed="true"]');
+    if (!b) return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try { b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { /* ignore */ }
+  }
+
+  function selectDay(i) {
+    selected = i;
+    try { localStorage.setItem('khoula-ed-b3-day', String(i)); } catch (e) { /* ignore */ }
+    strip.querySelectorAll('.day-btn').forEach(b => b.setAttribute('aria-pressed', String(parseInt(b.dataset.i, 10) === i)));
+    renderDay();
+    showView('day');
+    scrollSelectedIntoView();
+  }
+
+  // ---------- day view ----------
+  function personLi(p, parsed, dayIdx, lean) {
+    const roles = [];
+    if (parsed.role) roles.push('<span class="role ' + parsed.role + '">' + ROLE[parsed.role] + '</span>');
+    if (parsed.star && !lean) roles.push('<span class="role star" title="Admin morning, not a clinical shift">M*</span>');
+    if (parsed.course && !lean) roles.push('<span class="role course">Course</span>');
+    if (parsed.rel && !lean) roles.push('<span class="role course" title="Released by the programme for the day (R): not a clinical shift">Released</span>');
+    if (p.hod && !lean) roles.push('<span class="role hod">HOD</span>');
+    if (dayIdx !== undefined && p.changed[dayIdx]) roles.push('<span class="role chg" title="Was ' + escapeHtml(p.changed[dayIdx].from === '-' ? 'blank' : p.changed[dayIdx].from) + ' on the issued roster">Changed</span>');
+    if (!lean && dayIdx !== undefined && p.req && p.req[dayIdx]) roles.push('<span class="role req" title="' + escapeHtml(reqLabel(p.req[dayIdx])) + '">Request</span>');
+    if (!lean && dayIdx !== undefined && p.polFlags && p.polFlags.flags[dayIdx]) { const pf = p.polFlags.flags[dayIdx]; roles.push('<span class="role ' + (pf.level === 'bad' ? 'pol' : 'polw') + '" title="' + escapeHtml(pf.why) + '">' + (pf.level === 'bad' ? 'Policy' : 'Check') + '</span>'); }
+    const who = '<span class="who"><span class="name">' + escapeHtml(p.display) + telHtml(contactFor(p.fullName || p.name, p)) + '</span>' +
+      (p.grade ? '<span class="grade">' + escapeHtml(p.grade) + '</span>' : '') + '</span>';
+    return '<li>' + who + '<span class="roles">' + roles.join('') + '</span></li>';
+  }
+  function sortByRole(a, b) {
+    const ra = a.parsed.role ? ROLE_ORDER[a.parsed.role] : (a.p.hod ? 4 : 5);
+    const rb = b.parsed.role ? ROLE_ORDER[b.parsed.role] : (b.p.hod ? 4 : 5);
+    return ra - rb || a.p.display.localeCompare(b.p.display);
+  }
+
+  function renderDay() {
+    const d = days[selected];
+    document.getElementById('weekLabel').textContent = 'Week ' + (d.week + 1) + ' of 4 · ' + DATA.block.label;
+    document.getElementById('dateTitle').textContent = DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] + ' ' + d.year;
+    let sub = '<span>Day ' + (d.i + 1) + ' of ' + N + '</span>';
+    if (d.weekend) sub += '<span class="pill weekend">Weekend</span>';
+    if (d.ph) sub += '<span class="pill ph">' + escapeHtml(TALLY.holidayName) + ' \u00b7 public holiday</span>';
+    if (d.i === todayIdx) sub += '<span class="pill today">Today</span>';
+    const changedToday = people.filter(p => p.changed[d.i]).length;
+    if (changedToday) sub += '<span class="pill chg">' + changedToday + ' change' + (changedToday > 1 ? 's' : '') + ' today</span>';
+    document.getElementById('dateSub').innerHTML = sub;
+    const third = DATA.thirdOnCall[d.week];
+    document.getElementById('thirdName').textContent = third;
+    const wf = days[d.week * 7], wl = days[d.week * 7 + 6];
+    document.getElementById('thirdNote').textContent = 'Whole week, ' + wf.dnum + ' ' + MON[wf.mon] + ' – ' + wl.dnum + ' ' + MON[wl.mon];
+
+    const byShift = { M: [], E: [], N: [] };
+    const oncall = [], course = [], pm = [], admin = [];
+    const off = [], leave = [], ml = [], po = [], ph = [], none = [];
+    people.forEach(p => {
+      const code = p.codes[d.i];
+      const parsed = parse(code);
+      const entry = { p, parsed, code };
+      switch (parsed.kind) {
+        case 'shift': if (p.hod && parsed.shift === 'M') admin.push(entry); else { byShift[parsed.shift].push(entry); if (parsed.course) course.push(entry); } break;
+        case 'admin': admin.push(entry); break;
+        case 'oc': oncall.push(entry); break;
+        case 'c': course.push(entry); break;
+        case 'rel': course.push(entry); break;
+        case 'pm': pm.push(entry); break;
+        case 'off': off.push(entry); break;
+        case 'lv': (parsed.ml ? ml : leave).push(entry); break;
+        case 'ph': (parsed.po ? po : ph).push(entry); break;
+        default: none.push(entry);
+      }
+    });
+
+    const fmNames = (DATA.rotators && DATA.rotators.famcoWeekend && DATA.rotators.famcoWeekend[d.iso]) || null;
+    let html = '';
+    SHIFTS.forEach(sh => {
+      const list = byShift[sh.key];
+      const staff = list.filter(e => e.p.group === 'staff').sort(sortByRole);
+      const trainees = list.filter(e => e.p.group !== 'staff').sort(sortByRole);
+      const headCount = list.length + (sh.key === 'M' && fmNames ? fmNames.length : 0);
+      html += '<section class="card ' + sh.cls + '"><div class="head"><h3><span class="dot"></span>' + sh.name + ' <span class="time">' + sh.time + '</span></h3><span class="count num">' + headCount + '</span></div>';
+      if (!list.length && !(sh.key === 'M' && fmNames)) html += '<div class="empty">No one rostered.</div>';
+      if (staff.length) html += '<ul class="people">' + staff.map(e => personLi(e.p, e.parsed, d.i, true)).join('') + '</ul>';
+      if (trainees.length) html += '<div class="subhead">Residents &amp; interns</div><ul class="people">' + trainees.map(e => personLi(e.p, e.parsed, d.i, true)).join('') + '</ul>';
+      if (sh.key === 'M' && fmNames) {
+        html += '<div class="subhead">Family Medicine weekend cover</div><ul class="people">' +
+          fmNames.map(n => '<li><span class="who"><span class="name">' + escapeHtml(n) + telHtml(contactFor(n)) + '</span><span class="grade">FM R4</span></span><span class="roles"><span class="role fm">FAMCO</span></span></li>').join('') + '</ul>';
+      }
+      html += '</section>';
+    });
+    document.getElementById('shifts').innerHTML = html;
+
+    // Day view shows the shifts and the on-call only (Isra, 7 Nov 2026); courses, releases, pain clinic and the off-duty list stay on the grid and personal views
+    let ex = '';
+    ex += '<section class="card oc"><div class="head"><h3><span class="dot"></span>On call <span class="time">covers E &amp; N shifts</span></h3><span class="count num">' + oncall.length + '</span></div>' +
+      (oncall.length ? '<ul class="people">' + oncall.sort(sortByRole).map(e => personLi(e.p, e.parsed, d.i, true)).join('') + '</ul>' : '<div class="empty">No one on call.</div>') + '</section>';
+    document.getElementById('extras').innerHTML = ex;
+    document.getElementById('offDetails').hidden = true;
+
+    const offCount = off.length + leave.length + ml.length + po.length + ph.length;
+    document.getElementById('offSummary').textContent = 'Off duty today · ' + offCount;
+    function grp(cls, lab, list) {
+      if (!list.length) return '';
+      return '<div class="offgroup ' + cls + '"><div class="gl">' + lab + ' · ' + list.length + '</div><div class="names">' +
+        list.map(e => escapeHtml(e.p.display) + (e.p.group !== 'staff' ? ' <span class="grade">' + escapeHtml(e.p.grade) + '</span>' : '')).join(', ') + '</div></div>';
+    }
+    document.getElementById('offBody').innerHTML =
+      grp('off', 'Off', off) + grp('lv', 'Leave', leave) + grp('lv', 'ML', ml) + grp('ph', 'Pending off', po) + grp('ph', 'Public holiday', ph) +
+      (none.length ? '<div class="offgroup"><div class="gl" style="color:var(--muted)">No entry on roster · ' + none.length + '</div><div class="names" style="color:var(--muted)">' + none.map(e => escapeHtml(e.p.display)).join(', ') + '</div></div>' : '');
+  }
+
+  // ---------- legend + footer ----------
+  function legendHtml() {
+    return '<div><h3>Shifts</h3><ul>' +
+      '<li><span class="code m">M</span> Morning · 7 AM – 3 PM</li>' +
+      '<li><span class="code e">E</span> Evening · 3 PM – 11 PM</li>' +
+      '<li><span class="code n">N</span> Night · 11 PM – 7 AM</li>' +
+      '<li><span class="code oc">Oc</span> On call for E and N shifts</li>' +
+      '<li><span class="code rel">R</span> Resident released by the programme (not a clinical shift)</li></ul></div>' +
+      '<div><h3>Role suffix</h3><ul>' +
+      '<li><span class="code">r</span> Resus in-charge</li>' +
+      '<li><span class="code">s</span> Supervisor</li>' +
+      '<li><span class="code">t</span> Triage doctor</li>' +
+      '<li><span class="code">c</span> Receives calls from outside</li>' +
+      '<li><span class="code admin">M*</span> Admin morning (not a clinical shift)</li></ul></div>' +
+      '<div><h3>Other</h3><ul>' +
+      '<li><span class="code c">C</span> Course or teaching</li>' +
+      '<li><span class="code pm">PM</span> Pain management</li>' +
+      '<li><span class="code off">O</span> Off</li>' +
+      '<li><span class="code lv">L</span> Leave &nbsp; <span class="code lv">ML</span> ML (leave, as marked)</li>' +
+      '<li><span class="code ph">PH</span> Public holiday &nbsp; <span class="code ph">P/O</span> Pending off</li>' +
+      '<li><span class="code m chg">Mt</span> Changed since the roster was issued</li>' +
+      (REQS.length ? '<li><span class="code off req">O</span> Request from the requests sheet, honoured (see Changes)</li>' : '') +
+      (POLICY_FLAGS ? '<li><span class="code e pol-bad">E</span> Breaks the EM residents\' duty-hours policy</li><li><span class="code e pol-warn">E</span> Allowed only if needed (Tuesday evening)</li>' : '') + '</ul></div>';
+  }
+  document.getElementById('legend2').innerHTML = legendHtml();
+  document.getElementById('footNote').innerHTML = '<div class="by">Created by ' + escapeHtml(DATA.block.createdBy) + '</div>' +
+    '<div>Transcribed from the ' + escapeHtml(DATA.block.label) + ' roster (' + escapeHtml(DATA.block.year) + '), checked by ' + escapeHtml(DATA.block.checkedBy) + '. Changes approved by the rota maker are published here and listed under Changes.</div>';
+
+  // ---------- grid view ----------
+  function renderGrid() {
+    const weekendCls = i => days[i].weekend ? ' weekend' : '';
+    const todayCls = i => i === todayIdx ? ' today-col' : '';
+    let html = '<table class="grid"><thead><tr><th class="name">Name</th>';
+    days.forEach(d => {
+      html += '<th class="dh' + weekendCls(d.i) + todayCls(d.i) + (d.ph ? ' ph' : '') + '"' + (d.ph ? ' title="' + escapeHtml(TALLY.holidayName) + '"' : '') + '><button type="button" data-i="' + d.i + '" aria-label="Open ' + DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] + (d.ph ? ', ' + TALLY.holidayName : '') + '"><span class="dow">' + DOW[d.dow] + '</span><span class="dnum num">' + d.dnum + '</span></button></th>';
+    });
+    html += '<th class="tot" title="Clinical shifts (M, E and N) rostered this block">Shifts</th><th class="tot" title="Working hours this block at 8 hours per shift (M, E, N and admin M*); red above 140 hours (ED duty regulation, about 140 h per block)">Hours</th><th class="tot" title="Shifts as resus in-charge (r)">Resus</th><th class="tot" title="Shifts as triage doctor (t)">Triage</th><th class="tot"' + (TALLY ? ' title="Pending off days owed at the end of this block"' : '') + '>P/O</th><th class="tot"' + (TALLY ? ' title="Public holiday days owed at the end of this block"' : '') + '>PH</th></tr></thead><tbody>';
+    html += '<tr class="third"><td class="name">3rd on call</td>';
+    DATA.thirdOnCall.forEach(n => { html += '<td colspan="7">' + escapeHtml(n) + '</td>'; });
+    html += '<td class="tot"></td><td class="tot"></td><td class="tot"></td><td class="tot"></td><td class="tot"></td></tr>';
+    function row(p) {
+      const sf = p.polFlags && p.polFlags.shiftsFlag;
+      const hoursTot = p.codes.reduce((a, c) => { const q = parse(c); return a + ((q.kind === 'shift' || q.kind === 'admin') ? HOURS_PER_SHIFT : 0); }, 0);
+      let r = '<tr data-person="' + people.indexOf(p) + '"><td class="name" title="' + escapeHtml(p.name + (sf ? ' · ' + sf.why : '') + (hoursTot > HOURS_MAX && !p.hod && !p.noTally ? ' · ' + hoursTot + ' hours, above the ' + HOURS_MAX + ' h limit' : '')) + '">' + escapeHtml(p.name) + (p.grade ? ' <span class="grade">' + escapeHtml(p.grade) + '</span>' : '') + (sf ? '<span class="polbadge">' + p.polFlags.pol.shifts + '/' + escapeHtml(p.polFlags.rng) + '</span>' : '') + (hoursTot > HOURS_MAX && !p.hod && !p.noTally ? '<span class="hoursbadge" title="Above ' + HOURS_MAX + ' working hours this block">' + hoursTot + ' h</span>' : '') + '</td>';
+      p.codes.forEach((c, i) => {
+        const parsed = parse(c);
+        const chg = p.changed[i];
+        const pf = p.polFlags && p.polFlags.flags[i];
+        const rq = p.req[i];
+        const title = parsed.label + (chg ? ' · changed from ' + (chg.from === '-' ? 'blank' : chg.from) : '') + (pf ? ' · ' + pf.why : '') + (rq ? ' · ' + reqLabel(rq) : '');
+        r += '<td class="' + weekendCls(i).trim() + todayCls(i) + '"><span class="cell ' + cellClass(parsed) + (chg ? ' chg' : '') + (pf ? ' pol-' + pf.level : '') + (rq ? ' req' : '') + '" title="' + escapeHtml(title) + '">' + (c === '-' ? '' : escapeHtml(c)) + '</span></td>';
+      });
+      const sc = { M: 0, E: 0, N: 0 };
+      let adminN = 0;
+      p.codes.forEach(c => { const q = parse(c); if (q.kind === 'shift') sc[q.shift]++; else if (q.kind === 'admin') adminN++; });
+      const shiftsTot = sc.M + sc.E + sc.N + adminN;
+      const rc = { r: 0, t: 0 };
+      p.codes.forEach(c => { const q = parse(c); if (q.kind === 'shift' && (q.role === 'r' || q.role === 't')) rc[q.role]++; });
+      r += '<td class="tot num shiftsum" title="' + sc.M + ' morning, ' + sc.E + ' evening, ' + sc.N + ' night' + (adminN ? ', ' + adminN + ' admin (M*)' : '') + '">' + (shiftsTot || '') + '</td>';
+      const hours = shiftsTot * HOURS_PER_SHIFT;
+      const hoursFlag = hours > HOURS_MAX && !p.hod && !p.noTally;   // the HOD's own rota is not checked
+      r += '<td class="tot num' + (hoursFlag ? ' hours-bad' : '') + '" title="' + hours + ' hours at ' + HOURS_PER_SHIFT + ' h per shift' + (hoursFlag ? ' — above the ' + HOURS_MAX + ' h limit' : '') + '">' + (hours || '') + '</td>';
+      r += '<td class="tot num">' + (rc.r || '') + '</td><td class="tot num">' + (rc.t || '') + '</td>';
+      const ty = tallyFor(p);
+      if (ty) r += '<td class="tot num" title="' + escapeHtml(tallyText(ty)) + '">' + ty.poEnd + '</td><td class="tot num" title="' + escapeHtml(tallyText(ty)) + '">' + ty.phEnd + '</td></tr>';
+      else if (TALLY && p.noTally) r += '<td class="tot num"></td><td class="tot num"></td></tr>';
+      else if (TALLY && p.group !== 'staff') { const g = p.codes.filter(c => c === 'PH').length; r += '<td class="tot num"></td><td class="tot num"' + (g ? ' title="PH days given this block"' : '') + '>' + (g ? g + ' given' : '') + '</td></tr>'; }
+      else r += '<td class="tot num">' + (p.po === null || p.po === undefined ? '' : p.po) + '</td><td class="tot num">' + (p.ph === null || p.ph === undefined ? '' : p.ph) + '</td></tr>';
+      return r;
+    }
+    people.filter(p => p.group === 'staff').forEach(p => { html += row(p); });
+    html += '<tr class="section"><td class="name">OMSB residents</td><td colspan="' + (N + 5) + '"></td></tr>';
+    people.filter(p => p.group === 'resident').forEach(p => { html += row(p); });
+    html += '<tr class="section"><td class="name">GFP &amp; intern</td><td colspan="' + (N + 5) + '"></td></tr>';
+    people.filter(p => p.group === 'intern').forEach(p => { html += row(p); });
+    html += '<tr><td class="name" title="Family Medicine R4 residents on the morning shift">FAMCO weekend (M)</td>';
+    days.forEach(d => {
+      const fm = (DATA.rotators && DATA.rotators.famcoWeekend && DATA.rotators.famcoWeekend[d.iso]) || null;
+      html += '<td class="' + weekendCls(d.i).trim() + todayCls(d.i) + '"><span class="cell num"' + (fm ? ' title="' + escapeHtml(fm.join(', ')) + '"' : '') + '>' + (fm ? fm.length : (d.weekend ? DATA.famcoWeekend : '')) + '</span></td>';
+    });
+    html += '<td class="tot"></td><td class="tot"></td><td class="tot"></td><td class="tot"></td><td class="tot"></td></tr>';
+    html += '</tbody></table>';
+    const wrap = document.getElementById('gridwrap');
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('thead button').forEach(b => b.addEventListener('click', () => selectDay(parseInt(b.dataset.i, 10))));
+    wrap.querySelectorAll('tbody tr[data-person] td.name').forEach(td => {
+      td.style.cursor = 'pointer';
+      td.addEventListener('click', () => { selectedPerson = parseInt(td.parentNode.dataset.person, 10); renderPerson(); showView('staff'); });
+    });
+  }
+
+  // ---------- person view ----------
+  const sel = document.getElementById('personSelect');
+  function peopleOptions(selectedIdx) {
+    const groups = [['staff', 'Staff'], ['resident', 'OMSB residents'], ['intern', 'GFP & intern']];
+    let html = '';
+    groups.forEach(([g, lab]) => {
+      html += '<optgroup label="' + lab + '">';
+      people.forEach((p, idx) => { if (p.group === g) html += '<option value="' + idx + '"' + (idx === selectedIdx ? ' selected' : '') + '>' + escapeHtml(p.fullName || p.name) + (p.grade ? ' · ' + escapeHtml(p.grade) : '') + '</option>'; });
+      html += '</optgroup>';
+    });
+    return html;
+  }
+  function dayOptions(selectedIdx) {
+    return days.map(d => '<option value="' + d.i + '"' + (d.i === selectedIdx ? ' selected' : '') + '>' + shortDate(d) + '</option>').join('');
+  }
+  function renderPicker() { sel.innerHTML = peopleOptions(selectedPerson); }
+  sel.addEventListener('change', () => { selectedPerson = parseInt(sel.value, 10); renderPerson(); showView('staff'); });
+  const copyBtn = document.getElementById('copyLink');
+  function copyText(text, btn, idleLabel, fallbackEl) {
+    const done = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = idleLabel; }, 1800); };
+    const fallback = () => {
+      try {
+        if (fallbackEl && typeof fallbackEl.select === 'function') { fallbackEl.select(); }
+        else { const r = document.createRange(); r.selectNodeContents(fallbackEl); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+        btn.textContent = 'Select and copy';
+      } catch (e) { /* ignore */ }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback);
+    else fallback();
+  }
+  copyBtn.addEventListener('click', () => copyText(document.getElementById('myLink').textContent, copyBtn, 'Copy link', document.getElementById('myLink')));
+
+  function renderPerson() {
+    const p = people[selectedPerson];
+    sel.value = String(selectedPerson);
+    document.getElementById('myLink').textContent = SHARE_URL + '#' + p.slug;
+    const pcEl = document.getElementById('personContact');
+    const ct = contactFor(p.fullName || p.name, p);
+    if (ct && (ct.phone || ct.email)) {
+      pcEl.innerHTML = 'Contact: ' + (ct.phone ? telHtml(ct) : '') + (ct.phone && ct.email ? ' \u00b7 ' : '') + (ct.email ? '<a class="mail" href="mailto:' + escapeHtml(ct.email) + '">' + escapeHtml(ct.email) + '</a>' : '');
+      pcEl.hidden = false;
+    } else { pcEl.hidden = true; pcEl.innerHTML = ''; }
+    try { localStorage.setItem('khoula-ed-b3-me', p.slug); } catch (e) { /* ignore */ }
+    const counts = { M: 0, E: 0, N: 0, Oc: 0, C: 0, PM: 0, Off: 0, Leave: 0, Admin: 0 };
+    let done = 0, doneOc = 0;
+    const cutoff = todayIdx >= 0 ? todayIdx : (TODAY > last.iso ? N : 0);
+    p.codes.forEach((c, i) => {
+      const q = parse(c);
+      if (q.kind === 'shift') { counts[q.shift]++; if (q.course) counts.C++; if (i < cutoff) done++; }
+      else if (q.kind === 'oc') { counts.Oc++; if (i < cutoff) doneOc++; }
+      else if (q.kind === 'c') counts.C++;
+      else if (q.kind === 'rel') counts.R = (counts.R || 0) + 1;
+      else if (q.kind === 'pm') counts.PM++;
+      else if (q.kind === 'admin') { counts.Admin++; if (i < cutoff) done++; }
+      else if (q.kind === 'off') counts.Off++;
+      else if (q.kind === 'lv') counts.Leave++;
+    });
+    const total = counts.M + counts.E + counts.N + counts.Admin;   // admin mornings (M*) count in the total, not in the morning tally
+    const remaining = total - done;
+    let tot = '<div class="total-main"><span class="v num">' + total + '</span><span class="k">' + (total === 1 ? 'shift' : 'shifts') + ' rostered this block</span></div>';
+    tot += '<div class="total-sub">';
+    tot += '<span><b class="num">' + counts.M + '</b> morning</span><span><b class="num">' + counts.E + '</b> evening</span><span><b class="num">' + counts.N + '</b> night</span>';
+    if (counts.Oc) tot += '<span>plus <b class="num">' + counts.Oc + '</b> on call</span>';
+    if (counts.PM) tot += '<span>plus <b class="num">' + counts.PM + '</b> pain management</span>';
+    if (counts.Admin) tot += '<span>including <b class="num">' + counts.Admin + '</b> admin morning' + (counts.Admin > 1 ? 's' : '') + ' (M*)</span>';
+    tot += '</div>';
+    if (total) {
+      let progress;
+      if (cutoff >= N) progress = 'Block complete: all <b class="num">' + total + '</b> shifts done' + (counts.Oc ? ' and <b class="num">' + counts.Oc + '</b> on call' : '') + '.';
+      else if (cutoff <= 0) progress = 'Block not started yet.';
+      else progress = '<b class="num">' + done + '</b> done so far (to ' + days[cutoff - 1].dnum + ' ' + MON[days[cutoff - 1].mon] + ')' + (counts.Oc ? ', <b class="num">' + doneOc + '</b> of the on-call days' : '') + ' · <b class="num">' + remaining + '</b> remaining';
+      tot += '<div class="total-sub"><span>' + progress + '</span></div>';
+      tot += '<div class="bar" role="img" aria-label="' + done + ' of ' + total + ' shifts done"><span style="width:' + Math.round(100 * Math.min(done, total) / total) + '%"></span></div>';
+    } else {
+      tot += '<div class="total-sub">No M, E or N shifts on this roster.</div>';
+    }
+    document.getElementById('total').innerHTML = tot;
+
+    const pc = document.getElementById('policyCard');
+    const pol = emPolicyFor(p, p.codes);
+    if (pol) {
+      const ok = v => v ? '<span class="lvl on">OK</span>' : '<span class="lvl bad">Check</span>';
+      let rows = '';
+      rows += '<li><span class="who"><span class="name">Shifts' + (pol.rel ? ' (' + pol.clinical + ' clinical + ' + pol.rel + ' release day' + (pol.rel > 1 ? 's' : '') + ' R)' : '') + '</span><span class="meta">' + (pol.senior ? 'Senior (R4–R5)' : 'Junior (R1–R3)') + (pol.leaveWeek ? ', one leave week this block: adjusted target' : '') + (pol.phDays ? ', ' + pol.phDays + ' PH day' + (pol.phDays > 1 ? 's' : '') + ' deducted' : '') + ': ' + (pol.rec[0] === pol.rec[1] ? pol.rec[0] : pol.rec[0] + '–' + pol.rec[1]) + ' per block</span></span><span class="roles"><b class="num">' + pol.shifts + '</b>' + ok(pol.shiftsOk) + '</span></li>';
+      rows += '<li><span class="who"><span class="name">Night shifts</span><span class="meta">Maximum ' + pol.maxN + ' per block</span></span><span class="roles"><b class="num">' + pol.nights + '</b>' + ok(pol.nightsOk) + '</span></li>';
+      rows += '<li><span class="who"><span class="name">Full weekends (Fri + Sat)</span><span class="meta">Not more than 2 per block' + (pol.thuWeekend.length ? '; Thursday evening/night counts as weekend duty (' + pol.thuWeekend.map(w => weekDay(w, 4)).join(', ') + ')' : '') + '</span></span><span class="roles"><b class="num">' + pol.fullWeekends.length + '</b>' + ok(pol.weekendsOk) + '</span></li>';
+      rows += '<li><span class="who"><span class="name">Wednesday teaching (RAA 8 AM – 2 PM)</span><span class="meta">No morning or evening shift on Wednesdays' + (pol.wedBad.length ? ': ' + pol.wedBad.map(w => weekDay(w, 3)).join(', ') : '') + '</span></span><span class="roles">' + ok(!pol.wedBad.length) + '</span></li>';
+      rows += '<li><span class="who"><span class="name">Tuesday cut-off (nothing after 10 PM)</span><span class="meta">' + (pol.tueNight.length ? 'Night on ' + pol.tueNight.map(w => weekDay(w, 2)).join(', ') : 'No Tuesday nights') + (pol.tueEve.length ? '; evening on ' + pol.tueEve.map(w => weekDay(w, 2)).join(', ') + ' (only if needed, finish by 10 PM)' : '') + '</span></span><span class="roles">' + ok(!pol.tueNight.length) + '</span></li>';
+      const breaches = p.polFlags ? Object.keys(p.polFlags.flags).filter(i => p.polFlags.flags[i].level === 'bad').length + (p.polFlags.shiftsFlag ? 1 : 0) : 0;
+      pc.innerHTML = '<h3>EM duty-hours policy</h3><p class="lead">OMSB EM residency Duty Hours Policy, 21 July 2025. Mandatory courses (ACLS, PALS, ATLS, NRP, core POCUS) count as clinical shifts; RAA Wednesdays (C) do not.</p>' +
+        (POLICY_FLAGS ? (breaches ? '<div class="polnote">' + breaches + ' policy breach' + (breaches > 1 ? 'es' : '') + ' marked in red on the days below.</div>' : '<div class="ok">No policy breaches this block.</div>') : '') +
+        '<ul class="people" style="margin:0 -16px -14px">' + rows + '</ul>';
+      pc.hidden = false;
+    } else {
+      pc.hidden = true; pc.innerHTML = '';
+    }
+
+    let st = '';
+    st += '<div class="stat m"><span class="v num">' + counts.M + '</span><span class="k">Morning</span></div>';
+    st += '<div class="stat e"><span class="v num">' + counts.E + '</span><span class="k">Evening</span></div>';
+    st += '<div class="stat n"><span class="v num">' + counts.N + '</span><span class="k">Night</span></div>';
+    const rcnt = { r: 0, t: 0 };
+    p.codes.forEach(c => { const q = parse(c); if (q.kind === 'shift' && (q.role === 'r' || q.role === 't')) rcnt[q.role]++; });
+    if (rcnt.r || rcnt.t || p.group === 'staff') { st += '<div class="stat"><span class="v num">' + rcnt.r + '</span><span class="k">Resus in-charge</span></div>'; st += '<div class="stat"><span class="v num">' + rcnt.t + '</span><span class="k">Triage</span></div>'; }
+    const hoursP = total * HOURS_PER_SHIFT;
+    const hoursPFlag = hoursP > HOURS_MAX && !p.hod && !p.noTally;
+    st += '<div class="stat"><span class="v num' + (hoursPFlag ? ' hours-bad' : '') + '">' + hoursP + '</span><span class="k">Hours' + (hoursPFlag ? ' · above ' + HOURS_MAX : '') + '</span></div>';
+    st += '<div class="stat oc"><span class="v num">' + counts.Oc + '</span><span class="k">On call</span></div>';
+    if (counts.R) st += '<div class="stat c"><span class="v num">' + counts.R + '</span><span class="k">Released (R)</span></div>';
+    st += '<div class="stat c"><span class="v num">' + counts.C + '</span><span class="k">Course</span></div>';
+    if (counts.PM) st += '<div class="stat"><span class="v num" style="color:var(--pm-fg)">' + counts.PM + '</span><span class="k">Pain mgmt</span></div>';
+    if (counts.Admin) st += '<div class="stat admin"><span class="v num">' + counts.Admin + '</span><span class="k">Admin (M*)</span></div>';
+    st += '<div class="stat"><span class="v num">' + counts.Off + '</span><span class="k">Off</span></div>';
+    st += '<div class="stat"><span class="v num">' + counts.Leave + '</span><span class="k">Leave</span></div>';
+    const ty = tallyFor(p);
+    if (ty) {
+      st += '<div class="stat"><span class="v num">' + ty.poEnd + '</span><span class="k">P/O owed</span></div>';
+      st += '<div class="stat"><span class="v num">' + ty.phEnd + '</span><span class="k">PH owed</span></div>';
+      st += '<div class="tally">' + tallyHtml(ty) + '</div>';
+    } else if (p.group === 'staff' && !(TALLY && p.noTally)) {
+      st += '<div class="stat"><span class="v num">' + (p.po === null || p.po === undefined ? '–' : p.po) + '</span><span class="k">P/O on roster</span></div>';
+      st += '<div class="stat"><span class="v num">' + (p.ph === null || p.ph === undefined ? '–' : p.ph) + '</span><span class="k">PH on roster</span></div>';
+    } else if (TALLY) {
+      const g = p.codes.filter(c => c === 'PH').length;
+      if (g) st += '<div class="stat"><span class="v num">' + g + '</span><span class="k">PH days</span></div>';
+    }
+    document.getElementById('stats').innerHTML = st;
+
+    let wk = '';
+    for (let w = 0; w < 4; w++) {
+      const wf = days[w * 7], wl = days[w * 7 + 6];
+      wk += '<section class="week"><div class="wh"><span>Week ' + (w + 1) + ' · ' + wf.dnum + ' ' + MON[wf.mon] + ' – ' + wl.dnum + ' ' + MON[wl.mon] + '</span><span class="third-tag">3rd on call <b>' + escapeHtml(DATA.thirdOnCall[w]) + '</b></span></div><div class="wdays">';
+      for (let k = 0; k < 7; k++) {
+        const d = days[w * 7 + k];
+        const c = p.codes[d.i];
+        const q = parse(c);
+        const chg = p.changed[d.i];
+        const pf = p.polFlags && p.polFlags.flags[d.i];
+        const rq = p.req[d.i];
+        const ttl = [chg ? 'Changed from ' + (chg.from === '-' ? 'blank' : chg.from) : '', pf ? pf.why : '', rq ? reqLabel(rq) : ''].filter(Boolean).join(' · ');
+        wk += '<button type="button" class="wday' + (d.weekend ? ' weekend' : '') + (d.i === todayIdx ? ' today' : '') + '" data-i="' + d.i + '" aria-label="Open ' + DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] + '"' + (ttl ? ' title="' + escapeHtml(ttl) + '"' : '') + '>' +
+          '<span class="d">' + DOW[d.dow] + '<b class="num">' + d.dnum + '</b></span>' +
+          '<span class="code ' + cellClass(q) + (chg ? ' chg' : '') + (pf ? ' pol-' + pf.level : '') + (rq ? ' req' : '') + '">' + (c === '-' ? '·' : escapeHtml(c)) + '</span>' +
+          '<span class="lab">' + escapeHtml(q.label) + '</span></button>';
+      }
+      wk += '</div></section>';
+    }
+    const weeks = document.getElementById('weeks');
+    weeks.innerHTML = wk;
+    weeks.querySelectorAll('.wday').forEach(b => b.addEventListener('click', () => selectDay(parseInt(b.dataset.i, 10))));
+    if (!reqPanel.hidden) fillRequest(true);
+  }
+
+  // ---------- EM duty-hours policy (OMSB EM programme, 21 July 2025) ----------
+  function isEmResident(p) { return p.group === 'resident' && /EM/.test(p.grade || ''); }
+  function emPolicyFor(p, codes) {
+    if (!isEmResident(p)) return null;
+    const m = /R(\d)/.exec(p.grade || ''); const level = m ? parseInt(m[1], 10) : 1;
+    const senior = level >= 4;
+    const parsed = codes.map(parse);
+    const leaveDays = parsed.filter(q => q.kind === 'lv').length;
+    const leaveWeek = leaveDays >= 5;
+    // 12 clinical shifts (M/E/N) is the floor for every resident; a release day with a programme letter (R) counts as an
+    // extra shift only once those 12 are there (Isra, 7 Nov 2026)
+    const clinical = parsed.filter(q => q.kind === 'shift').length;
+    const rel = parsed.filter(q => q.kind === 'rel').length;
+    const shifts = clinical >= 12 ? clinical + rel : clinical;
+    const nights = parsed.filter(q => q.kind === 'shift' && q.shift === 'N').length;
+    const phDays = codes.filter(c => c === 'PH').length;   // public holidays given to the resident: deducted from the shift target
+    const base = senior ? (leaveWeek ? [12, 12] : [14, 15]) : (leaveWeek ? [14, 14] : [16, 17]);
+    const rec = base.map(x => Math.max(12, x - phDays));   // never below 12 clinical shifts per block, even with leave (Isra, 3 Nov 2026)
+    rec[1] = Math.max(rec[1], 12 + rel);                   // the release days sit on top of the floor
+    const maxN = leaveWeek ? 3 : 4;
+    const fullWeekends = [], thuWeekend = [], wedBad = [], tueNight = [], tueEve = [];
+    for (let w = 0; w < 4; w++) {
+      const tue = parsed[w * 7 + 2], wed = parsed[w * 7 + 3], thu = parsed[w * 7 + 4], fri = parsed[w * 7 + 5], sat = parsed[w * 7 + 6];
+      if (fri.kind === 'shift' && sat.kind === 'shift') fullWeekends.push(w);
+      if (thu.kind === 'shift' && (thu.shift === 'E' || thu.shift === 'N')) thuWeekend.push(w);
+      if (wed.kind === 'shift' && (wed.shift === 'M' || wed.shift === 'E')) wedBad.push(w);
+      if (tue.kind === 'shift' && tue.shift === 'N') tueNight.push(w);
+      if (tue.kind === 'shift' && tue.shift === 'E') tueEve.push(w);
+    }
+    return { level, senior, leaveWeek, shifts, clinical, rel, nights, rec, phDays, maxN, fullWeekends, thuWeekend, wedBad, tueNight, tueEve,
+      shiftsOk: clinical >= 12 && shifts >= rec[0] && shifts <= rec[1], nightsOk: nights <= maxN, weekendsOk: fullWeekends.length <= 2 };
+  }
+  const weekDay = (w, k) => shortDate(days[w * 7 + k]);
+  function emPolicyFlags(p, codes) {
+    const pol = emPolicyFor(p, codes); if (!pol) return null;
+    const flags = {};
+    const set = (i, level, why) => { if (!flags[i] || (level === 'bad' && flags[i].level !== 'bad')) flags[i] = { level, why }; };
+    const parsed = codes.map(parse);
+    let fullWk = 0, nightsSeen = 0;
+    for (let w = 0; w < 4; w++) {
+      const tueI = w * 7 + 2, wedI = w * 7 + 3, friI = w * 7 + 5, satI = w * 7 + 6;
+      const tue = parsed[tueI], wed = parsed[wedI], fri = parsed[friI], sat = parsed[satI];
+      if (wed.kind === 'shift' && (wed.shift === 'M' || wed.shift === 'E')) set(wedI, 'bad', 'No morning or evening on RAA Wednesday');
+      if (tue.kind === 'shift' && tue.shift === 'N') set(tueI, 'bad', 'Nothing after 10 PM on Tuesday');
+      if (tue.kind === 'shift' && tue.shift === 'E') set(tueI, 'warn', 'Tuesday evening only if needed; finish by 10 PM');
+      if (fri.kind === 'shift' && sat.kind === 'shift') { fullWk++; if (fullWk > 2) { set(friI, 'bad', 'Full weekend ' + fullWk + ', policy maximum 2'); set(satI, 'bad', 'Full weekend ' + fullWk + ', policy maximum 2'); } }
+    }
+    parsed.forEach((q, i) => { if (q.kind === 'shift' && q.shift === 'N') { nightsSeen++; if (nightsSeen > pol.maxN) set(i, 'bad', 'Night ' + nightsSeen + ', policy maximum ' + pol.maxN); } });
+    const rng = pol.rec[0] === pol.rec[1] ? String(pol.rec[0]) : pol.rec[0] + '–' + pol.rec[1];
+    const shiftsFlag = pol.shiftsOk ? null : { level: 'bad', why: pol.clinical + ' clinical shifts' + (pol.rel ? ' + ' + pol.rel + ' release' : '') + (pol.clinical < 12 ? '; floor 12 clinical' : '; policy ' + rng + ' for ' + (pol.senior ? 'seniors' : 'juniors')) };
+    return { pol, flags, shiftsFlag, rng };
+  }
+  people.forEach(p => { p.polFlags = POLICY_FLAGS ? emPolicyFlags(p, p.codes) : null; });
+
+  // ---------- request a change (anyone) ----------
+  const reqPanel = document.getElementById('reqPanel');
+  const reqDay = document.getElementById('reqDay'), reqKind = document.getElementById('reqKind'), reqWith = document.getElementById('reqWith');
+  const reqOther = document.getElementById('reqOther'), reqReason = document.getElementById('reqReason'), reqMsg = document.getElementById('reqMsg');
+  document.getElementById('reqBtn').addEventListener('click', () => {
+    reqPanel.hidden = !reqPanel.hidden;
+    if (!reqPanel.hidden) { fillRequest(false); try { reqPanel.scrollIntoView({ block: 'nearest' }); } catch (e) { /* ignore */ } }
+  });
+  function fillRequest(keep) {
+    const p = people[selectedPerson];
+    document.getElementById('reqLead').textContent = 'For ' + p.display + '. The message goes to the rota maker (' + DATA.block.createdBy + '), who approves and publishes the change here.';
+    if (!keep || !reqDay.options.length) {
+      const def = todayIdx >= 0 ? Math.min(todayIdx + 2, N - 1) : 0;
+      reqDay.innerHTML = dayOptions(def);
+      reqWith.innerHTML = peopleOptions(-1);
+      reqWith.value = String(people.findIndex(x => x !== p));
+    }
+    updateRequest();
+  }
+  function updateRequest() {
+    const p = people[selectedPerson];
+    const di = parseInt(reqDay.value, 10);
+    const d = days[di];
+    const myCode = p.codes[di];
+    const my = parse(myCode);
+    const say = (code, q) => code === '-' ? 'no entry' : code + ' (' + q.label + ')';
+    document.getElementById('reqNow').textContent = 'Rostered: ' + say(myCode, my);
+    const swap = reqKind.value === 'swap';
+    document.getElementById('reqWithField').hidden = !swap;
+    document.getElementById('reqOtherField').hidden = swap;
+    const lines = ['Change request · ' + DATA.block.label + ' (' + DATA.block.year + ')', p.display + (p.grade ? ' (' + p.grade + ')' : ''), DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] + ' · rostered ' + say(myCode, my)];
+    if (swap) {
+      const w = people[parseInt(reqWith.value, 10)];
+      if (w) {
+        const wc = w.codes[di];
+        document.getElementById('reqWithNow').textContent = w.display + ' that day: ' + say(wc, parse(wc));
+        lines.push('Swap with ' + w.display + ', rostered ' + say(wc, parse(wc)) + ' that day');
+      }
+    } else {
+      lines.push('Proposed: ' + (reqOther.value.trim() || '…'));
+    }
+    lines.push('Reason: ' + (reqReason.value.trim() || '…'));
+    lines.push('Both of us agree. Please approve and publish.');
+    const text = lines.join('\n');
+    reqMsg.value = text;
+    const wa = document.getElementById('reqWa');
+    if (REQUEST_WHATSAPP) { wa.hidden = false; wa.href = 'https://wa.me/' + REQUEST_WHATSAPP + '?text=' + encodeURIComponent(text); }
+  }
+  [reqDay, reqKind, reqWith].forEach(el => el.addEventListener('change', updateRequest));
+  [reqOther, reqReason].forEach(el => el.addEventListener('input', updateRequest));
+  document.getElementById('reqCopy').addEventListener('click', () => copyText(reqMsg.value, document.getElementById('reqCopy'), 'Copy message', reqMsg));
+
+  // ---------- change log ----------
+  function fmtWhen(iso) {
+    try {
+      return new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Muscat', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+    } catch (e) { return String(iso); }
+  }
+  function describe(ch) {
+    const items = (ch.items || []).map(it => {
+      const p = bySlug(it.slug);
+      const d = days[it.day];
+      return '<b>' + escapeHtml(p ? p.display : it.slug) + '</b> ' + (d ? shortDate(d) : '') + ': ' + escapeHtml(it.from === '-' ? 'blank' : it.from) + ' → ' + escapeHtml(it.to === '-' ? 'blank' : it.to);
+    });
+    return (ch.kind === 'swap' ? 'Swap · ' : 'Change · ') + items.join(' · ');
+  }
+  function renderRequests() {
+    const head = document.getElementById('reqHead'), ul = document.getElementById('reqlog');
+    if (!REQS.length) { head.hidden = true; ul.hidden = true; return; }
+    head.hidden = false; ul.hidden = false;
+    document.getElementById('reqStamp').textContent = REQS.filter(q => q.met).length + ' of ' + REQS.length + ' honoured';
+    ul.innerHTML = REQS.map(q => {
+      const p = people.find(x => x.name === q.person && (!q.group || x.group === q.group));
+      const d = days[q.day];
+      const when = d ? DOWL[d.dow] + ' ' + d.dnum + ' ' + MONL[d.mon] : 'day ' + (q.day + 1);
+      return '<li><span class="when">' + escapeHtml(when) + '</span><span class="what">' + escapeHtml((p ? p.display + (p.grade ? ' (' + p.grade + ')' : '') : q.person)) + ': ' + escapeHtml(q.want === 'O' ? 'day off' : q.want + ' shift') + ' (' + (q.must ? 'must' : 'prefer') + ') — <b>' + (q.met ? 'honoured' : 'not met') + '</b></span>' + (q.note ? '<span class="note">' + escapeHtml(q.note) + '</span>' : '') + '</li>';
+    }).join('');
+  }
+  function renderChanges() {
+    renderRequests();
+    const badge = document.getElementById('chgBadge');
+    badge.hidden = CHANGES.length === 0;
+    badge.textContent = String(CHANGES.length);
+    const stamp = document.getElementById('chgStamp');
+    stamp.textContent = CHANGES.length ? 'Last updated ' + fmtWhen(CHANGES[CHANGES.length - 1].at) : 'No changes since the roster was issued.';
+    const ul = document.getElementById('changelog');
+    if (!CHANGES.length) { ul.innerHTML = '<li><span class="what" style="color:var(--muted)">The roster is as issued.</span></li>'; return; }
+    ul.innerHTML = CHANGES.slice().reverse().map(ch =>
+      '<li><span class="when">' + escapeHtml(fmtWhen(ch.at)) + '</span><span class="what">' + describe(ch) + '</span>' + (ch.note ? '<span class="note">' + escapeHtml(ch.note) + '</span>' : '') + '</li>').join('');
+  }
+
+  // ---------- record a change (rota maker only) ----------
+  let artifactNs = null;
+  const adm = {
+    panel: document.getElementById('adminPanel'), A: document.getElementById('admA'), dayA: document.getElementById('admDayA'),
+    B: document.getElementById('admB'), dayB: document.getElementById('admDayB'), code: document.getElementById('admCode'),
+    note: document.getElementById('admNote'), preview: document.getElementById('admPreview'), warn: document.getElementById('admWarn'),
+    publish: document.getElementById('admPublish'), undo: document.getElementById('admUndo'), status: document.getElementById('admStatus'),
+    kindSwap: document.getElementById('kindSwap'), kindEdit: document.getElementById('kindEdit'),
+  };
+  let admKind = 'swap';
+  function setKind(k) {
+    admKind = k;
+    adm.kindSwap.setAttribute('aria-pressed', String(k === 'swap'));
+    adm.kindEdit.setAttribute('aria-pressed', String(k === 'edit'));
+    document.getElementById('admBField').hidden = k !== 'swap';
+    document.getElementById('admDayBField').hidden = k !== 'swap';
+    document.getElementById('admCodeField').hidden = k !== 'edit';
+    updateAdmin();
+  }
+  adm.kindSwap.addEventListener('click', () => setKind('swap'));
+  adm.kindEdit.addEventListener('click', () => setKind('edit'));
+
+  // The cell edits the form describes: [{slug, day, from, to}]
+  function proposedItems() {
+    const a = people[parseInt(adm.A.value, 10)], dA = parseInt(adm.dayA.value, 10);
+    if (!a || isNaN(dA)) return [];
+    if (admKind === 'edit') {
+      const to = adm.code.value;
+      return to === a.codes[dA] ? [] : [{ slug: a.slug, day: dA, from: a.codes[dA], to }];
+    }
+    const b = people[parseInt(adm.B.value, 10)], dB = parseInt(adm.dayB.value, 10);
+    if (!b || b === a || isNaN(dB)) return [];
+    const items = [];
+    const dayset = dA === dB ? [dA] : [dA, dB];
+    dayset.forEach(dd => {
+      const ca = a.codes[dd], cb = b.codes[dd];
+      if (ca !== cb) { items.push({ slug: a.slug, day: dd, from: ca, to: cb }); items.push({ slug: b.slug, day: dd, from: cb, to: ca }); }
+    });
+    return items;
+  }
+  function checkItems(items) {
+    const warnings = [];
+    const sim = {};
+    people.forEach(p => { sim[p.slug] = p.codes.slice(); });
+    items.forEach(it => { sim[it.slug][it.day] = it.to; });
+    const shiftOf = c => { const q = parse(c); return q.kind === 'shift' ? q.shift : null; };
+    items.forEach(it => {
+      const p = bySlug(it.slug); const codes = sim[it.slug];
+      const sh = shiftOf(it.to);
+      if (sh) {
+        const prev = it.day > 0 ? shiftOf(codes[it.day - 1]) : null;
+        const next = it.day < N - 1 ? shiftOf(codes[it.day + 1]) : null;
+        if (prev === 'N' && sh === 'M') warnings.push(p.display + ' would go straight from a Night into a Morning on ' + shortDate(days[it.day]) + '.');
+        if (prev === 'E' && sh === 'M') warnings.push(p.display + ' would have only 8 hours between Evening and Morning on ' + shortDate(days[it.day]) + '.');
+        if (sh === 'N' && next === 'M') warnings.push(p.display + ' would finish a Night at 7 AM and start a Morning the same morning (' + shortDate(days[it.day + 1]) + ').');
+        if (sh === 'E' && next === 'M') warnings.push(p.display + ' would have only 8 hours before the Morning on ' + shortDate(days[it.day + 1]) + '.');
+        if (parse(it.from).kind === 'lv') warnings.push(p.display + ' is on leave that day on the issued roster.');
+      }
+      const fq = parse(it.from), tq = parse(it.to);
+      if (fq.kind === 'shift' && tq.kind === 'shift' && fq.shift !== tq.shift) warnings.push(p.display + ': not like for like (' + it.from + ' → ' + it.to + ').');
+      if (fq.kind === 'shift' && fq.role && (tq.kind !== 'shift' || tq.role !== fq.role)) warnings.push(p.display + ' gives up the ' + ROLE[fq.role] + ' role on ' + shortDate(days[it.day]) + '. Check the colleague taking it is qualified.');
+    });
+    [...new Set(items.map(it => it.slug))].forEach(slug => {
+      const p = bySlug(slug); const pol = emPolicyFor(p, sim[slug]);
+      if (!pol) return;
+      const rng = pol.rec[0] === pol.rec[1] ? String(pol.rec[0]) : pol.rec[0] + '–' + pol.rec[1];
+      if (!pol.shiftsOk) warnings.push(p.display + ' (EM ' + (pol.senior ? 'senior' : 'junior') + ') would have ' + pol.shifts + ' clinical shifts; policy says ' + rng + ' per block.');
+      if (!pol.nightsOk) warnings.push(p.display + ' would have ' + pol.nights + ' nights; policy maximum is ' + pol.maxN + '.');
+      if (!pol.weekendsOk) warnings.push(p.display + ' would work ' + pol.fullWeekends.length + ' full weekends; policy maximum is 2.');
+      pol.wedBad.forEach(w => warnings.push(p.display + ': no morning or evening shift on Wednesday ' + weekDay(w, 3) + ' (RAA teaching 8 AM – 2 PM; a night is allowed).'));
+      pol.tueNight.forEach(w => warnings.push(p.display + ': no Tuesday night (' + weekDay(w, 2) + '); policy allows nothing after 10 PM on Tuesdays.'));
+      pol.tueEve.forEach(w => warnings.push(p.display + ': Tuesday evening on ' + weekDay(w, 2) + ' only if needed, and must finish by 10 PM.'));
+    });
+    const affected = [...new Set(items.map(it => it.day))];
+    affected.forEach(dd => {
+      const cover = { M: new Set(), E: new Set(), N: new Set() };
+      const before = { M: new Set(), E: new Set(), N: new Set() };
+      people.forEach(p => {
+        const q = parse(sim[p.slug][dd]); if (q.kind === 'shift' && q.role) cover[q.shift].add(q.role);
+        const q0 = parse(p.codes[dd]); if (q0.kind === 'shift' && q0.role) before[q0.shift].add(q0.role);
+      });
+      ['M', 'E', 'N'].forEach(sh => ['r', 't', 'c'].forEach(role => {
+        if (before[sh].has(role) && !cover[sh].has(role)) warnings.push(SHIFTS.find(s => s.key === sh).name + ' on ' + shortDate(days[dd]) + ' loses its ' + ROLE[role] + '.');
+      }));
+    });
+    return warnings;
+  }
+  function updateAdmin() {
+    const a = people[parseInt(adm.A.value, 10)], dA = parseInt(adm.dayA.value, 10);
+    const b = people[parseInt(adm.B.value, 10)], dB = parseInt(adm.dayB.value, 10);
+    const say = c => c === '-' ? 'no entry' : c + ' · ' + parse(c).label;
+    document.getElementById('admNowA').textContent = a ? 'Rostered ' + say(a.codes[dA]) : '';
+    document.getElementById('admNowB').textContent = (admKind === 'swap' && b) ? b.display + ' rostered ' + say(b.codes[dB]) : '';
+    const items = proposedItems();
+    if (!items.length) {
+      adm.preview.innerHTML = '<div class="line" style="color:var(--muted)">' + (admKind === 'swap' ? 'Pick two different doctors whose codes differ on the chosen day.' : 'Pick a new code that differs from the current one.') + '</div>';
+      adm.warn.innerHTML = ''; adm.publish.disabled = true; return;
+    }
+    adm.publish.disabled = false;
+    adm.preview.innerHTML = items.map(it => { const p = bySlug(it.slug); return '<div class="line"><b>' + escapeHtml(p.display) + '</b> · ' + shortDate(days[it.day]) + ': ' + escapeHtml(it.from === '-' ? 'blank' : it.from) + ' → ' + escapeHtml(it.to === '-' ? 'blank' : it.to) + '</div>'; }).join('');
+    const w = checkItems(items);
+    adm.warn.innerHTML = w.length ? w.map(x => '<div class="warn">' + escapeHtml(x) + '</div>').join('') : '<div class="ok">No rest or coverage problems found.</div>';
+  }
+  function setupAdmin() {
+    adm.A.innerHTML = peopleOptions(0);
+    adm.B.innerHTML = peopleOptions(1);
+    const def = todayIdx >= 0 ? Math.min(todayIdx + 1, N - 1) : 0;
+    adm.dayA.innerHTML = dayOptions(def);
+    adm.dayB.innerHTML = dayOptions(def);
+    adm.code.innerHTML = ALL_CODES.map(c => '<option value="' + c + '">' + (c === '-' ? 'blank (no entry)' : c + ' · ' + parse(c).label) + '</option>').join('');
+    adm.dayA.addEventListener('change', () => { adm.dayB.value = adm.dayA.value; updateAdmin(); });
+    [adm.A, adm.B, adm.dayB, adm.code].forEach(el => el.addEventListener('change', updateAdmin));
+    adm.undo.hidden = CHANGES.length === 0;
+    updateAdmin();
+    // Draft check (Isra, 7 Nov 2026): the next block is generated automatically; the rota maker marks it as checked here
+    const chk = document.getElementById('admCheck'), chkBtn = document.getElementById('admChecked'), chkSt = document.getElementById('admCheckStatus');
+    if (/^nobody/i.test(DATA.block.checkedBy || '')) {
+      chk.hidden = false;
+      chkBtn.addEventListener('click', async () => {
+        chkBtn.disabled = true; chkSt.className = 'status'; chkSt.textContent = 'Publishing\u2026';
+        try {
+          if (!artifactNs) throw { code: 'not_granted', message: 'publishing is not available in this view' };
+          const stamp = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+          const block = Object.assign({}, DATA.block, { checkedBy: 'the rota maker, ' + stamp });
+          await artifactNs.publish(rebuildDocument(CHANGES, null, { block }));
+          chkSt.textContent = 'Recorded. Reloading\u2026';
+        } catch (e) {
+          chkSt.className = 'status err'; chkSt.textContent = 'Could not publish: ' + ((e && e.message) || 'unknown error') + '. Try again.'; chkBtn.disabled = false;
+        }
+      });
+    }
+    adm.publish.addEventListener('click', async () => {
+      const items = proposedItems(); if (!items.length) return;
+      const change = { id: 'c' + Date.now().toString(36), kind: admKind, at: new Date().toISOString(), note: adm.note.value.trim(), items };
+      await publishChanges(CHANGES.concat([change]), 'Publishing the change…');
+    });
+    adm.undo.addEventListener('click', async () => {
+      if (!CHANGES.length) return;
+      if (adm.undo.dataset.armed !== '1') {
+        adm.undo.dataset.armed = '1'; adm.undo.textContent = 'Tap again to undo the last change';
+        setTimeout(() => { adm.undo.dataset.armed = ''; adm.undo.textContent = 'Undo last change'; }, 4000);
+        return;
+      }
+      await publishChanges(CHANGES.slice(0, -1), 'Undoing the last change…');
+    });
+  }
+  const FALLBACK_RESET = ':root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
+  // Rebuild the complete page from its stored source, with the given change list baked into the data.
+  function rebuildDocument(changes, leave, extra) {
+    const srcEl = document.getElementById('src');
+    if (!srcEl) throw { code: 'invalid_content', message: 'page source not found' };
+    const b64 = srcEl.textContent.replace(/\s+/g, '');
+    const bytes = Uint8Array.from(atob(b64), ch => ch.charCodeAt(0));
+    const template = new TextDecoder().decode(bytes);
+    const data = Object.assign({}, DATA, { changes }, leave ? { leave } : {}, extra || {});
+    const json = JSON.stringify(data).replace(/<\//g, '<\\/');
+    const dataMarker = '__DA' + 'TA__';
+    const srcMarker = '<!--' + 'SRC-->';
+    const srcBlock = '<script type="text/plain" id="src">' + b64 + '</scr' + 'ipt>';
+    const content = template.replace(dataMarker, () => json).replace(srcMarker, () => srcBlock);
+    const resetEl = Array.from(document.head.querySelectorAll('style')).find(s => /\[hidden\]/.test(s.textContent));
+    const reset = resetEl ? resetEl.textContent : FALLBACK_RESET;
+    return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>' + reset + '</style></head><body>' + content + '</body></html>';
+  }
+  async function publishChanges(changes, busyText) {
+    adm.status.className = 'status'; adm.status.textContent = busyText;
+    adm.publish.disabled = true; adm.undo.disabled = true;
+    try {
+      if (!artifactNs) throw { code: 'not_granted', message: 'publishing is not available in this view' };
+      const html = rebuildDocument(changes);
+      await artifactNs.publish(html);
+      adm.status.textContent = 'Published. Reloading…';
+    } catch (e) {
+      const code = e && e.code;
+      adm.status.className = 'status err';
+      if (code === 'conflict') adm.status.textContent = 'Someone published a newer version; reloading to it.';
+      else if (code === 'not_writer' || code === 'not_granted') { adm.status.textContent = 'This view cannot publish changes.'; adm.panel.hidden = true; }
+      else if (code === 'rate_limited') adm.status.textContent = 'Too many publishes in a row. Wait a minute and try again.';
+      else adm.status.textContent = 'Could not publish: ' + ((e && e.message) || 'unknown error') + '. Try again.';
+      adm.publish.disabled = false; adm.undo.disabled = false;
+    }
+  }
+  async function detectRotaMaker() {
+    const claude = window.claude;
+    if (!claude || typeof claude.use !== 'function') return;
+    try {
+      const [userNs, art] = await Promise.all([claude.use('user'), claude.use('artifact')]);
+      artifactNs = art;
+      const canEdit = userNs ? await userNs.canEdit() : false;
+      if (canEdit && art) { setupAdmin(); adm.panel.hidden = false; setupLeaveAdmin(); document.getElementById('lvAdmin').hidden = false; }
+    } catch (e) { /* stay read-only */ }
+  }
+
+  // ---------- rotators view ----------
+  const ROT = DATA.rotators || { blocks: [], programmes: [], rotators: [], khLeave: [], famcoWeekend: {} };
+  const fmtIso = iso => { const [y, m, dd] = iso.split('-').map(Number); return dd + ' ' + MON[m - 1]; };
+  const currentBlockN = (() => {
+    const b = ROT.blocks.find(b => TODAY >= b.start && TODAY <= b.end);
+    if (b) return b.n;
+    const mine = ROT.blocks.find(b => b.start === DATA.block.start);
+    return mine ? mine.n : (ROT.blocks[0] ? ROT.blocks[0].n : 1);
+  })();
+  const rosterBlockN = (ROT.blocks.find(b => b.start === DATA.block.start) || { n: currentBlockN }).n;
+  let selectedBlock = rosterBlockN;
+  function renderBlockChips() {
+    const el = document.getElementById('blockChips');
+    el.innerHTML = ROT.blocks.map(b => '<button type="button" class="chip' + (b.n === currentBlockN ? ' now' : '') + '" data-n="' + b.n + '" aria-pressed="' + (b.n === selectedBlock) + '"><span>Block ' + b.n + '</span><small>' + escapeHtml(b.label.replace(/ 20\d\d/g, '')) + '</small></button>').join('');
+    el.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { selectedBlock = parseInt(c.dataset.n, 10); renderBlockChips(); renderRotators(); }));
+  }
+  function renderRotators() {
+    const b = ROT.blocks.find(x => x.n === selectedBlock);
+    if (!b) return;
+    const inBlock = ROT.rotators.filter(r => r.block === b.n);
+    const leaves = (ROT.khLeave || []).filter(l => l.block === b.n);
+    let html = '<div class="rot">';
+    html += '<div class="rot-head"><div><h2>Block ' + b.n + '</h2><div class="sub">' + escapeHtml(b.label) + (b.n === rosterBlockN ? ' · this roster' : '') + (b.n === currentBlockN && b.n !== rosterBlockN ? ' · current block' : '') + '</div></div>' +
+      '<div class="sub"><b class="num" style="color:var(--fg)">' + inBlock.length + '</b> resident' + (inBlock.length === 1 ? '' : 's') + ' posted to Khoula ED</div></div>';
+    html += '<div class="rot-grid">';
+    ROT.programmes.forEach(p => {
+      const list = inBlock.filter(r => r.prog === p.key);
+      if (!list.length && p.key !== 'EM' && p.key !== 'FM') return;
+      html += '<section class="card"><div class="head"><h3>' + escapeHtml(p.name) + '</h3><span class="count num">' + list.length + '</span></div>';
+      if (list.length) {
+        html += '<ul class="people">' + list.map(r => {
+          const lv = leaves.filter(l => l.name === r.name);
+          return '<li><span class="who"><span class="name">' + escapeHtml(r.name) + telHtml(contactFor(r.name)) + (r.note ? '<span class="meta">' + escapeHtml(r.note) + '</span>' : '') +
+            lv.map(l => '<span class="meta" style="color:var(--lv-fg)">' + escapeHtml(l.type) + ' ' + fmtIso(l.from) + ' – ' + fmtIso(l.to) + ' (approved on EM Space)</span>').join('') +
+            '</span></span><span class="lvl' + (p.key === 'EM' ? ' em' : '') + '">' + escapeHtml(r.level) + (p.key === 'FM' ? ' FAMCO' : '') + '</span></li>';
+        }).join('') + '</ul>';
+      } else {
+        html += '<div class="empty">None this block.</div>';
+      }
+      if (p.release) html += '<div class="release"><b>Release:</b> ' + escapeHtml(p.release) + '</div>';
+      html += '</section>';
+    });
+    html += '</div>';
+    // FM weekend cover for the block
+    const wk = Object.keys(ROT.famcoWeekend || {}).filter(iso => iso >= b.start && iso <= b.end).sort();
+    if (wk.length) {
+      html += '<section class="card"><div class="head"><h3>Family Medicine weekend cover (R4) <span class="time">Morning shift, 7 AM – 3 PM</span></h3></div><ul class="people">' +
+        wk.map(iso => { const dt = new Date(iso + 'T00:00:00Z'); return '<li><span class="who" style="flex:0 0 auto;white-space:nowrap"><span class="name">' + DOW[dt.getUTCDay()] + ' ' + fmtIso(iso) + '</span></span><span class="roles">' + ROT.famcoWeekend[iso].map(n => '<span class="role" style="white-space:normal;text-align:right">' + escapeHtml(n) + telHtml(contactFor(n)) + '</span>').join('') + '</span></li>'; }).join('') +
+        '</ul>' + (ROT.famcoWeekendNote ? '<div class="release">' + escapeHtml(ROT.famcoWeekendNote) + '</div>' : '') + '</section>';
+    }
+    html += '</div>';
+    document.getElementById('rotatorsBody').innerHTML = html;
+    document.getElementById('rotatorsSource').textContent = 'Source: ' + (ROT.source || '');
+  }
+
+  // ---------- views ----------
+  const VIEWS = ['day', 'grid', 'staff', 'changes', 'rotators', 'leave', 'prev'];
+  function showView(v) {
+    const pi = people.findIndex(p => p.slug === v);
+    if (pi >= 0) { selectedPerson = pi; renderPerson(); v = 'staff'; }
+    if (!VIEWS.includes(v)) v = 'day';
+    const hash = v === 'staff' ? people[selectedPerson].slug : v;
+    VIEWS.forEach(x => {
+      document.getElementById('view-' + x).hidden = x !== v;
+      document.getElementById('tab-' + x).setAttribute('aria-selected', String(x === v));
+    });
+    if (location.hash !== '#' + hash) {
+      try { history.replaceState(null, '', '#' + hash); } catch (e) { location.hash = hash; }
+    }
+    if (v === 'leave' && !showView.lvScrolled) { showView.lvScrolled = true; requestAnimationFrame(lvScrollToToday); }
+  }
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+  window.addEventListener('hashchange', () => showView(location.hash.replace('#', '')));
+
+  // ---------- next-block requests link ----------
+  if (NEXT_BLOCK_REQUESTS_URL) {
+    ['nextReqLink', 'nextReqLink2'].forEach(id => { const a = document.getElementById(id); a.href = NEXT_BLOCK_REQUESTS_URL; a.hidden = false; });
+  }
+
+
+  // ---------- annual leave plan: by block, by week, by year; request composer; rota maker's entries ----------
+  const LEAVE = (DATA.leave && Array.isArray(DATA.leave.entries)) ? DATA.leave : { updated: '', entries: [] };
+  const lvEntries = LEAVE.entries.filter(e => e && e.name && /^\d{4}-\d\d-\d\d$/.test(e.from || '') && /^\d{4}-\d\d-\d\d$/.test(e.to || ''));
+  const lvIsoMs = iso => { const [y, m, dd] = iso.split('-').map(Number); return Date.UTC(y, m - 1, dd); };
+  const lvNames = people.filter(p => p.group === 'staff').map(p => p.name);
+  const lvOrder = n => { const k = lvNames.indexOf(n); return k < 0 ? 1000 : k; };
+  let lvStartMs = Math.min(lvIsoMs(DATA.block.start), lvIsoMs('2026-10-25'));
+  lvStartMs -= new Date(lvStartMs).getUTCDay() * 86400000;              // start on a Sunday
+  let lvEndMs = Date.UTC(new Date(lvIsoMs(DATA.block.start)).getUTCFullYear() + 1, 11, 31);
+  lvEntries.forEach(e => { const t = lvIsoMs(e.to) + 14 * 86400000; if (t > lvEndMs) lvEndMs = t; });
+  const LN = Math.round((lvEndMs - lvStartMs) / 86400000) + 1;
+  const lvIdx = iso => Math.round((lvIsoMs(iso) - lvStartMs) / 86400000);
+  const lvDate = i => new Date(lvStartMs + i * 86400000);
+  const lvFmt = (i, year) => { const d = lvDate(i); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + (year ? ' ' + d.getUTCFullYear() : ''); };
+  const lvRange = (a, b) => { const A = lvDate(a), B = lvDate(b); if (a === b) return lvFmt(a, true); if (A.getUTCFullYear() === B.getUTCFullYear() && A.getUTCMonth() === B.getUTCMonth()) return A.getUTCDate() + '–' + lvFmt(b, true); return lvFmt(a, A.getUTCFullYear() !== B.getUTCFullYear()) + ' – ' + lvFmt(b, true); };
+  const lvWe = i => { const d = lvDate(i).getUTCDay(); return d === 5 || d === 6; };
+  const lvTodayIdx = lvIdx(TODAY);
+  const lvInRange = lvTodayIdx >= 0 && lvTodayIdx < LN;
+  const lvWeeks = Math.ceil(LN / 7);
+  const lvWeekEntries = w => { const a = w * 7, b = Math.min(LN - 1, a + 6); return lvEntries.filter(e => lvIdx(e.from) <= b && lvIdx(e.to) >= a); };
+  const lvWeekNames = w => [...new Set(lvWeekEntries(w).map(e => e.name))];
+  const lvScale = n => n <= 1 ? 'lv-s1' : n === 2 ? 'lv-s2' : n === 3 ? 'lv-s3' : n === 4 ? 'lv-s4' : 'lv-s5';
+  const lvBlocks = (ROT.blocks || []).map(b => ({ n: b.n, start: b.start, end: b.end, a: lvIdx(b.start), b: lvIdx(b.end) })).filter(b => b.b >= 0 && b.a < LN);
+  const lvYears = []; for (let y = lvDate(0).getUTCFullYear(); y <= lvDate(LN - 1).getUTCFullYear(); y++) lvYears.push(y);
+  const lvRows = (() => {
+    const by = new Map();
+    lvEntries.forEach(e => { if (!by.has(e.name)) by.set(e.name, []); by.get(e.name).push(e); });
+    return [...by.keys()].sort((a, b) => lvOrder(a) - lvOrder(b) || a.localeCompare(b)).map(name => {
+      const cov = new Array(LN).fill(null);
+      by.get(name).forEach(e => { const a = Math.max(0, lvIdx(e.from)), b = Math.min(LN - 1, lvIdx(e.to)); for (let i = a; i <= b; i++) { const c = cov[i]; if (!c || (e.status === 'approved' && c.status !== 'approved')) cov[i] = e; } });
+      return { name, cov };
+    });
+  })();
+  let lvMode = 'block', lvBlockN = null, lvYear = null;
+  // the chart for a range of days [a, b]; compact = year scale (week columns), block = one block
+  function lvChartHtml(a, b, kind) {
+    const rows = lvRows.filter(r => r.cov.slice(a, b + 1).some(Boolean));
+    if (!rows.length) return '<p class="lv-empty">No annual leave in this ' + (kind === 'year' ? 'year' : 'block') + '.</p>';
+    const n = b - a + 1;
+    let h = '<table><colgroup><col class="lv-name">'; for (let i = 0; i < n; i++) h += '<col class="lv-day">'; h += '</colgroup><thead>';
+    h += '<tr class="lv-months"><th class="lv-corner lv-lbl">Month</th>';
+    for (let i = a; i <= b;) { const d = lvDate(i); const y = d.getUTCFullYear(), m = d.getUTCMonth(); let j = i; while (j <= b && lvDate(j).getUTCMonth() === m && lvDate(j).getUTCFullYear() === y) j++; h += '<th colspan="' + (j - i) + '">' + MON[m] + ' ' + y + '</th>'; i = j; }
+    h += '</tr>';
+    if (kind === 'year') {
+      h += '<tr class="lv-blocks"><th class="lv-corner lv-lbl">Block</th>';
+      let i = a; lvBlocks.forEach(bl => { const x = Math.max(a, bl.a), y = Math.min(b, bl.b); if (y < a || x > b || y < x) return; if (x > i) h += '<th colspan="' + (x - i) + '"></th>'; h += '<th colspan="' + (y - x + 1) + '" title="Block ' + bl.n + ' · ' + lvRange(bl.a, bl.b) + '">' + bl.n + '</th>'; i = y + 1; });
+      if (i <= b) h += '<th colspan="' + (b - i + 1) + '" title="Block dates for the next academic year are not published yet"></th>';
+      h += '</tr>';
+    }
+    h += '<tr class="lv-weeks"><th class="lv-corner lv-lbl">Week</th>';
+    for (let i = a; i <= b;) { const w = Math.floor(i / 7); const j = Math.min(b, w * 7 + 6); h += '<th colspan="' + (j - i + 1) + '" class="lv-wkend"><span class="lv-full">' + (kind === 'block' ? 'Week ' + (w - Math.floor(a / 7) + 1) + ' · ' : '') + lvFmt(w * 7) + '</span><span class="lv-short">' + lvDate(w * 7).getUTCDate() + '</span></th>'; i = j + 1; }
+    h += '</tr><tr class="lv-band"><th class="lv-corner lv-lbl">On leave this week</th>';
+    for (let i = a; i <= b;) { const w = Math.floor(i / 7); const j = Math.min(b, w * 7 + 6); const names = lvWeekNames(w); h += '<th colspan="' + (j - i + 1) + '" class="' + lvScale(names.length) + ' lv-wkend" title="' + escapeHtml(names.length ? names.join(', ') : 'nobody') + ' — week of ' + lvFmt(w * 7, true) + '">' + names.length + '</th>'; i = j + 1; }
+    h += '</tr><tr class="lv-days"><th class="lv-corner lv-lbl">Day</th>';
+    for (let i = a; i <= b; i++) { const d = lvDate(i); const cls = []; if (lvWe(i)) cls.push('lv-we'); if (d.getUTCDate() === 1) cls.push('lv-first'); if (i === lvTodayIdx) cls.push('lv-td'); if (d.getUTCDay() === 6) cls.push('lv-wkend'); h += '<th class="' + cls.join(' ') + '" id="lvday' + i + '">' + d.getUTCDate() + '</th>'; }
+    h += '</tr><tr class="lv-dow"><th class="lv-corner lv-lbl">Name</th>';
+    for (let i = a; i <= b; i++) { const d = lvDate(i); const cls = []; if (lvWe(i)) cls.push('lv-we'); if (i === lvTodayIdx) cls.push('lv-td'); if (d.getUTCDay() === 6) cls.push('lv-wkend'); h += '<th class="' + cls.join(' ') + '">' + DOW[d.getUTCDay()][0] + '</th>'; }
+    h += '</tr></thead><tbody>';
+    rows.forEach(r => {
+      h += '<tr class="lv-person"><td class="lv-who">' + escapeHtml(r.name) + '</td>';
+      for (let i = a; i <= b; i++) {
+        const cls = []; if (lvWe(i)) cls.push('lv-we'); if (i === lvTodayIdx) cls.push('lv-td'); if (lvDate(i).getUTCDay() === 6) cls.push('lv-wkend');
+        const e = r.cov[i]; let title = '';
+        if (e) { cls.push('lv-bar'); if (e.status === 'requested') cls.push('lv-req'); if (i === a || r.cov[i - 1] !== e) cls.push('lv-s'); if (i === b || r.cov[i + 1] !== e) cls.push('lv-e'); title = e.name + ': leave ' + lvRange(lvIdx(e.from), lvIdx(e.to)) + (e.status === 'requested' ? ' (requested)' : '') + (e.note ? ' — ' + e.note : ''); }
+        h += '<td class="' + cls.join(' ') + '"' + (title ? ' title="' + escapeHtml(title) + '"' : '') + '></td>';
+      }
+      h += '</tr>';
+    });
+    h += '<tr class="lv-total"><td class="lv-who">Total on leave</td>';
+    for (let i = a; i <= b; i++) { const c = rows.filter(r => r.cov[i]).length; const cls = ['lv-n' + Math.min(5, c)]; if (c === 0) cls.push('lv-zero'); if (lvWe(i)) cls.push('lv-we'); if (i === lvTodayIdx) cls.push('lv-td'); if (lvDate(i).getUTCDay() === 6) cls.push('lv-wkend'); h += '<td class="' + cls.join(' ') + '">' + c + '</td>'; }
+    return h + '</tr></tbody></table>';
+  }
+  function lvWeeksHtml(year) {
+    let h = ''; let lastMonth = -1; let any = false;
+    for (let w = 0; w < lvWeeks; w++) {
+      const a = w * 7, b = Math.min(LN - 1, a + 6); const d = lvDate(a);
+      if (year && d.getUTCFullYear() !== year && lvDate(b).getUTCFullYear() !== year) continue;
+      const es = lvWeekEntries(w); if (!es.length && !(lvInRange && lvTodayIdx >= a && lvTodayIdx <= b)) continue;
+      any = true;
+      if (d.getUTCMonth() !== lastMonth) { lastMonth = d.getUTCMonth(); h += '<div class="mh">' + MONL[lastMonth] + ' ' + d.getUTCFullYear() + '</div>'; }
+      const bl = lvBlocks.find(x => a >= x.a && a <= x.b);
+      const names = [...new Map(es.map(e => [e.name, e])).values()].sort((x, y) => lvOrder(x.name) - lvOrder(y.name));
+      const cnt = new Set(es.map(e => e.name)).size;
+      const now = lvInRange && lvTodayIdx >= a && lvTodayIdx <= b;
+      h += '<div class="wk' + (now ? ' now' : '') + '" id="lvwk' + w + '"><span class="d">' + lvRange(a, b) + '<small>' + (bl ? 'Block ' + bl.n + ' · week ' + (Math.floor((a - bl.a) / 7) + 1) : '') + (now ? (bl ? ' · ' : '') + 'this week' : '') + '</small></span>' +
+        '<span class="n ' + lvScale(cnt) + '">' + cnt + '</span><span class="names">' + (names.length ? names.map(e => escapeHtml(e.name) + (es.some(x => x.name === e.name && x.status === 'approved') ? '' : ' <span class="rq">(requested)</span>')).join(', ') : '<span class="rq">nobody on leave</span>') + '</span></div>';
+    }
+    return any ? h : '<p class="lv-empty">No annual leave in ' + (year || 'this period') + '.</p>';
+  }
+  function lvSetMode(mode) {
+    lvMode = mode;
+    ['Block', 'Week', 'Year'].forEach(m => document.getElementById('lvMode' + m).setAttribute('aria-pressed', String(mode === m.toLowerCase())));
+    try { localStorage.setItem('khoula-ed-leave-mode', mode); } catch (e) { /* ignore */ }
+    renderLeaveView();
+  }
+  function renderLeaveView() {
+    const chart = document.getElementById('leaveChart'), weeks = document.getElementById('leaveWeeks'), chips = document.getElementById('lvChips');
+    chart.classList.remove('lv-year', 'lv-block');
+    if (lvMode === 'block') {
+      if (lvBlockN === null) { const cur = lvBlocks.find(b => lvInRange && lvTodayIdx >= b.a && lvTodayIdx <= b.b) || lvBlocks.find(b => b.start === DATA.block.start) || lvBlocks[0]; lvBlockN = cur ? cur.n : null; }
+      chips.innerHTML = lvBlocks.map(b => '<button class="btn' + (b.n === lvBlockN ? ' primary' : '') + '" type="button" data-lvblock="' + b.n + '" title="' + lvRange(Math.max(0, b.a), Math.min(LN - 1, b.b)) + '">Block ' + b.n + '</button>').join('');
+      chips.querySelectorAll('[data-lvblock]').forEach(x => x.addEventListener('click', () => { lvBlockN = parseInt(x.dataset.lvblock, 10); renderLeaveView(); }));
+      const bl = lvBlocks.find(b => b.n === lvBlockN);
+      chart.hidden = false; weeks.hidden = true; chart.classList.add('lv-block');
+      chart.innerHTML = bl ? lvChartHtml(Math.max(0, bl.a), Math.min(LN - 1, bl.b), 'block') : '<p class="lv-empty">No block dates.</p>';
+    } else if (lvMode === 'year') {
+      if (lvYear === null) lvYear = lvInRange ? lvDate(lvTodayIdx).getUTCFullYear() : lvYears[0];
+      chips.innerHTML = lvYears.map(y => '<button class="btn' + (y === lvYear ? ' primary' : '') + '" type="button" data-lvyear="' + y + '">' + y + '</button>').join('');
+      chips.querySelectorAll('[data-lvyear]').forEach(x => x.addEventListener('click', () => { lvYear = parseInt(x.dataset.lvyear, 10); renderLeaveView(); }));
+      const a = Math.max(0, lvIdx(lvYear + '-01-01')), b = Math.min(LN - 1, lvIdx(lvYear + '-12-31'));
+      chart.hidden = false; weeks.hidden = true; chart.classList.add('lv-year');
+      chart.innerHTML = lvChartHtml(a, b, 'year');
+    } else {
+      if (lvYear === null) lvYear = lvInRange ? lvDate(lvTodayIdx).getUTCFullYear() : lvYears[0];
+      chips.innerHTML = lvYears.map(y => '<button class="btn' + (y === lvYear ? ' primary' : '') + '" type="button" data-lvyear="' + y + '">' + y + '</button>').join('') + '<button class="btn" type="button" data-lvyear="0">All</button>';
+      chips.querySelectorAll('[data-lvyear]').forEach(x => x.addEventListener('click', () => { lvYear = parseInt(x.dataset.lvyear, 10) || 0; renderLeaveView(); }));
+      chart.hidden = true; weeks.hidden = false;
+      weeks.innerHTML = lvWeeksHtml(lvYear || null);
+    }
+    document.getElementById('lvLegend').hidden = lvMode === 'week' && false;
+  }
+  function renderLeaveSummary() {
+    document.getElementById('lvStamp').textContent = (lvEntries.length ? lvEntries.length + ' entries' : 'No leave entered yet') + (LEAVE.updated ? ' · updated ' + LEAVE.updated : '');
+    const pending = lvEntries.filter(e => e.status === 'requested');
+    const onToday = lvInRange ? lvRows.filter(r => r.cov[lvTodayIdx] && r.cov[lvTodayIdx].status === 'approved').map(r => r.name) : [];
+    document.getElementById('lvSummary').textContent = (lvInRange ? 'On leave today: ' + (onToday.length ? onToday.join(', ') : 'nobody') + '. ' : '') +
+      (pending.length ? 'Awaiting a decision: ' + [...new Set(pending.map(e => e.name))].join(', ') + '.' : 'No requests are waiting for a decision.');
+    document.getElementById('lvNote').textContent = LEAVE.note || '';
+  }
+  // request composer (everyone): a message to the rota maker, like a change request
+  function lvNameOptions(sel, extra) {
+    sel.innerHTML = '<option value="">Choose a name…</option>' + lvNames.map(n => '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>').join('') + (extra ? '<option value="__other">Other (type a name)</option>' : '');
+  }
+  const LEAVE_SHEET = DATA.leaveSheet || null;
+  function setupLeaveRequest() {
+    const a = document.getElementById('lvrOpen');
+    if (LEAVE_SHEET && LEAVE_SHEET.url) a.href = LEAVE_SHEET.url;
+    else { a.hidden = true; document.getElementById('lvrLead').textContent = 'Send your dates to the rota maker, who puts them on the chart.'; document.getElementById('lvrHint').textContent = ''; }
+  }
+  // the rota maker's inbox: rows of the request sheet, read through the viewer's own Google Drive connector
+  function lvParseCsv(text) {
+    const rows = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === ',') { row.push(cell); cell = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += ch;
+    }
+    if (cell.length || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  function lvParseDate(v) {
+    v = String(v || '').trim(); if (!v) return null;
+    let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(v); if (m) return { iso: m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0'), sure: true };
+    m = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/.exec(v);
+    if (m) { let d = +m[1], mo = +m[2], y = +m[3]; if (y < 100) y += 2000; if (mo > 12 && d <= 12) { const t = d; d = mo; mo = t; } if (mo < 1 || mo > 12 || d < 1 || d > 31) return null; return { iso: y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0'), sure: true }; }   // the sheet exports day/month/year
+    m = /^(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?\s+(\d{4})/.exec(v);
+    if (m) { const mo = MON.findIndex(x => x.toLowerCase() === m[2].toLowerCase()); if (mo >= 0) return { iso: m[3] + '-' + String(mo + 1).padStart(2, '0') + '-' + String(+m[1]).padStart(2, '0'), sure: true }; }
+    const t = Date.parse(v); if (!isNaN(t)) { const d = new Date(t); return { iso: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'), sure: false }; }
+    return null;
+  }
+  function lvMatchName(raw) {
+    const q = normName(raw); if (!q.length) return null;
+    const exact = lvNames.find(n => n.toLowerCase() === String(raw).trim().toLowerCase()); if (exact) return exact;
+    const first = lvNames.filter(n => { const w = normName(n); return w.length && w[0] === q[0]; });
+    if (q.length >= 2) {
+      const full = first.filter(n => { const w = normName(n); return w.length >= 2 && w[w.length - 1].slice(0, 3) === q[q.length - 1].slice(0, 3); });
+      if (full.length === 1) return full[0];
+      if (full.length === 0 && first.length === 1 && normName(first[0]).length === 1) return first[0];
+      return null;
+    }
+    return first.length === 1 ? first[0] : null;
+  }
+  let lvInboxRows = [];
+  async function lvLoadInbox(fresh) {
+    const box = document.getElementById('lvInboxList'); const btn = document.getElementById('lvInboxRefresh');
+    if (!LEAVE_SHEET || !LEAVE_SHEET.id) { document.getElementById('lvInbox').hidden = true; return; }
+    const claude = window.claude; const mcp = claude && typeof claude.use === 'function' ? await claude.use('mcp') : null;
+    if (!mcp) { box.innerHTML = '<div class="row"><span class="nt">The request sheet can be read here only inside Claude with your Google Drive connected. Open the sheet to see new rows.</span></div>'; return; }
+    btn.disabled = true; box.innerHTML = '<div class="row"><span class="nt">Reading the request sheet…</span></div>';
+    try {
+      const res = await mcp.callTool('Google Drive', 'download_file_content', { fileId: LEAVE_SHEET.id, exportMimeType: 'text/csv' }, fresh ? { cache: false } : undefined);
+      const pl = res && res.payload; const b64 = pl && typeof pl === 'object' ? pl.content : (typeof pl === 'string' ? pl : '');
+      let csv = ''; try { csv = new TextDecoder().decode(Uint8Array.from(atob(String(b64 || '').replace(/\s+/g, '')), ch => ch.charCodeAt(0))); } catch (e) { csv = String(b64 || ''); }
+      // sheet columns: Name | Leave from | Leave to | Status (rota maker) | Rota maker note
+      const rows = lvParseCsv(csv).slice(1).filter(r => r.length >= 3 && (r[0] || '').trim() && !/^how to use/i.test(r[0] || ''));
+      lvInboxRows = rows.map((r, k) => { const from = lvParseDate(r[1]), to = lvParseDate(r[2]); const name = lvMatchName(r[0]); return { k, at: '', raw: (r[0] || '').trim(), name, from, to, reason: '', status: (r[3] || '').trim() }; })
+        .filter(x => x.from && x.to)
+        .filter(x => !lvEntries.some(e => e.name.toLowerCase() === (x.name || x.raw).toLowerCase() && e.from === x.from.iso && e.to === x.to.iso))
+        .filter(x => !/^(done|added|approved|declined|rejected|on chart)/i.test(x.status));
+      if (!lvInboxRows.length) { box.innerHTML = '<div class="row"><span class="nt">No new requests on the sheet.</span></div>'; }
+      else box.innerHTML = lvInboxRows.map(x => '<div class="row" data-k="' + x.k + '"><span class="nm">' + escapeHtml(x.name || x.raw) + (x.name ? '' : ' <span class="nt">(name not on the roster)</span>') + '</span><span class="dt">' + lvRange(lvIdx(x.from.iso), lvIdx(x.to.iso)) + (x.from.sure && x.to.sure ? '' : ' <span class="nt">(check the dates)</span>') + '</span>' + (x.reason ? '<span class="nt">' + escapeHtml(x.reason) + '</span>' : '') + (x.at ? '<span class="nt">sent ' + escapeHtml(x.at) + '</span>' : '') +
+        '<span class="act"><button type="button" class="tbtn" data-lvinreq="' + x.k + '">Put on chart</button><button type="button" class="tbtn" data-lvinok="' + x.k + '">Approve</button><button type="button" class="tbtn" data-lvinrev="' + x.k + '">Review</button></span></div>').join('');
+      const entryOf = (x, status) => ({ id: 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: x.name || x.raw, from: x.from.iso, to: x.to.iso, status, note: x.reason, src: 'sheet' });
+      box.querySelectorAll('[data-lvinreq]').forEach(b => b.addEventListener('click', () => { const x = lvInboxRows.find(r => r.k === +b.dataset.lvinreq); if (x) lvaPublish(lvEntries.concat([entryOf(x, 'requested')]), 'Putting it on the chart…'); }));
+      box.querySelectorAll('[data-lvinok]').forEach(b => b.addEventListener('click', () => { const x = lvInboxRows.find(r => r.k === +b.dataset.lvinok); if (x) lvaPublish(lvEntries.concat([entryOf(x, 'approved')]), 'Approving…'); }));
+      box.querySelectorAll('[data-lvinrev]').forEach(b => b.addEventListener('click', () => { const x = lvInboxRows.find(r => r.k === +b.dataset.lvinrev); if (!x) return; const f = lva(); lvEditing = null; const known = !!x.name; f.name.value = known ? x.name : '__other'; f.otherField.hidden = known; f.other.value = known ? '' : x.raw; f.from.value = x.from.iso; f.to.value = x.to.iso; f.status.value = 'requested'; f.note.value = x.reason; f.save.textContent = 'Save to the chart'; f.cancel.hidden = false; f.from.focus(); }));
+    } catch (e) {
+      const code = e && e.code;
+      let msg;
+      if (code === 'needs_reauth') msg = 'Google Drive needs reconnecting: claude.ai Settings → Connectors.';
+      else if (code === 'server_not_connected') msg = 'Connect Google Drive in claude.ai Settings → Connectors to see the sheet here.';
+      else if (code === 'not_in_manifest' || code === 'approval_required' || code === 'consent_required') msg = 'Allow this page to use your Google Drive when Claude asks, then tap Check the sheet.';
+      else if (code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') msg = 'The sheet cannot be read in this view. Open the sheet to see new rows.';
+      else msg = 'Could not read the sheet (' + (code || 'error') + '). Tap Check the sheet to try again.';
+      box.innerHTML = '<div class="row"><span class="nt">' + escapeHtml(msg) + '</span></div>';
+    } finally { btn.disabled = false; }
+  }
+  // rota maker: enter, approve, edit, delete; the page republishes itself with the leave in its data
+  let lvEditing = null;
+  const lva = () => ({ name: document.getElementById('lvaName'), other: document.getElementById('lvaOther'), otherField: document.getElementById('lvaOtherField'), from: document.getElementById('lvaFrom'), to: document.getElementById('lvaTo'), status: document.getElementById('lvaStatus'), note: document.getElementById('lvaNote'), save: document.getElementById('lvaSave'), cancel: document.getElementById('lvaCancel'), line: document.getElementById('lvaStatusLine'), list: document.getElementById('lvaList'), count: document.getElementById('lvaCount') });
+  function lvaSetStatus(msg, err) { const f = lva(); f.line.textContent = msg; f.line.className = 'status' + (err ? ' err' : ''); }
+  function lvaReset() {
+    const f = lva(); lvEditing = null; f.name.value = ''; f.otherField.hidden = true; f.other.value = ''; f.from.value = ''; f.to.value = ''; f.status.value = 'requested'; f.note.value = '';
+    f.save.textContent = 'Save to the chart'; f.cancel.hidden = true;
+  }
+  function lvaEdit(id) {
+    const e = lvEntries.find(x => x.id === id); if (!e) return; const f = lva(); lvEditing = id;
+    const known = lvNames.includes(e.name); f.name.value = known ? e.name : '__other'; f.otherField.hidden = known; f.other.value = known ? '' : e.name;
+    f.from.value = e.from; f.to.value = e.to; f.status.value = e.status === 'approved' ? 'approved' : 'requested'; f.note.value = e.note || '';
+    f.save.textContent = 'Save changes'; f.cancel.hidden = false; f.from.focus();
+  }
+  function lvaRead() {
+    const f = lva(); const clean = v => String(v || '').replace(/[\u0000-\u001f]/g, ' ').trim();
+    let name = f.name.value; if (name === '__other') name = clean(f.other.value);
+    const from = f.from.value, to = f.to.value;
+    if (!name) return { error: 'Choose a name.' };
+    if (!/^\d{4}-\d\d-\d\d$/.test(from) || !/^\d{4}-\d\d-\d\d$/.test(to)) return { error: 'Enter both dates.' };
+    if (lvIsoMs(to) < lvIsoMs(from)) return { error: 'The end date is before the start date.' };
+    return { entry: { id: lvEditing || ('l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)), name, from, to, status: f.status.value, note: clean(f.note.value) } };
+  }
+  function lvaRenderList() {
+    const f = lva();
+    const rows = lvEntries.slice().sort((a, b) => a.from.localeCompare(b.from) || lvOrder(a.name) - lvOrder(b.name));
+    f.count.textContent = rows.length ? rows.length + ' on the chart, ' + rows.filter(e => e.status === 'requested').length + ' requested' : '';
+    if (!rows.length) { f.list.innerHTML = '<div class="row"><span class="nt">Nothing on the chart yet.</span></div>'; return; }
+    f.list.innerHTML = rows.map(e => '<div class="row" data-id="' + escapeHtml(e.id) + '"><span class="nm">' + escapeHtml(e.name) + '</span><span class="dt">' + lvRange(lvIdx(e.from), lvIdx(e.to)) + ' · ' + (Math.round((lvIsoMs(e.to) - lvIsoMs(e.from)) / 86400000) + 1) + ' d</span><span class="lvpill ' + (e.status === 'approved' ? 'ok' : 'req') + '">' + (e.status === 'approved' ? 'Approved' : 'Requested') + '</span>' + (e.note ? '<span class="nt">' + escapeHtml(e.note) + '</span>' : '') +
+      '<span class="act">' + (e.status !== 'approved' ? '<button type="button" class="tbtn" data-lvapprove="' + escapeHtml(e.id) + '">Approve</button>' : '') + '<button type="button" class="tbtn" data-lvedit="' + escapeHtml(e.id) + '">Edit</button><button type="button" class="tbtn danger" data-lvdel="' + escapeHtml(e.id) + '">Delete</button></span></div>').join('');
+    f.list.querySelectorAll('[data-lvedit]').forEach(b => b.addEventListener('click', () => lvaEdit(b.dataset.lvedit)));
+    f.list.querySelectorAll('[data-lvapprove]').forEach(b => b.addEventListener('click', () => lvaPublish(lvEntries.map(e => e.id === b.dataset.lvapprove ? Object.assign({}, e, { status: 'approved' }) : e), 'Approving…')));
+    f.list.querySelectorAll('[data-lvdel]').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Tap again to delete'; setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Delete'; }, 4000); return; }
+      lvaPublish(lvEntries.filter(e => e.id !== b.dataset.lvdel), 'Deleting…');
+    }));
+  }
+  async function lvaPublish(entries, busyText) {
+    const f = lva(); lvaSetStatus(busyText); f.save.disabled = true;
+    const today = new Date(); const stamp = today.getDate() + ' ' + MON[today.getMonth()] + ' ' + today.getFullYear();
+    try {
+      if (!artifactNs) throw { code: 'not_granted' };
+      await artifactNs.publish(rebuildDocument(CHANGES, { updated: stamp, note: LEAVE.note || '', entries }));
+      lvaSetStatus('Saved. Reloading…');
+    } catch (e) {
+      const code = e && e.code;
+      if (code === 'conflict') lvaSetStatus('Someone published a newer version; reloading to it. Enter yours again after that.', true);
+      else if (code === 'not_writer' || code === 'not_granted') { lvaSetStatus('This view cannot publish.', true); document.getElementById('lvAdmin').hidden = true; }
+      else if (code === 'rate_limited') lvaSetStatus('Too many publishes in a row. Wait a minute and try again.', true);
+      else lvaSetStatus('Could not save: ' + ((e && e.message) || 'unknown error') + '. Try again.', true);
+      f.save.disabled = false;
+    }
+  }
+  function setupLeaveAdmin() {
+    const f = lva();
+    lvNameOptions(f.name, true);
+    f.name.addEventListener('change', () => { f.otherField.hidden = f.name.value !== '__other'; });
+    f.save.addEventListener('click', () => { const r = lvaRead(); if (r.error) { lvaSetStatus(r.error, true); return; } const next = lvEditing ? lvEntries.map(e => e.id === lvEditing ? r.entry : e) : lvEntries.concat([r.entry]); lvaPublish(next, 'Saving…'); });
+    f.cancel.addEventListener('click', lvaReset);
+    lvaReset(); lvaRenderList();
+    document.getElementById('lvInboxRefresh').addEventListener('click', () => lvLoadInbox(true));
+    lvLoadInbox(false);
+  }
+  function lvScrollToToday() {
+    if (!lvInRange) return;
+    if (lvMode === 'week') { const el = document.getElementById('lvwk' + Math.floor(lvTodayIdx / 7)); if (el) el.scrollIntoView({ block: 'center' }); return; }
+    const box = document.getElementById('leaveChart'); const cell = document.getElementById('lvday' + lvTodayIdx); if (!cell) return;
+    const nameCol = box.querySelector('col.lv-name'); const w = nameCol ? (nameCol.getBoundingClientRect().width || 150) : 150;
+    box.scrollTo({ left: Math.max(0, cell.offsetLeft - w - 8), top: box.scrollTop });
+  }
+  function renderLeave() {
+    renderLeaveSummary(); setupLeaveRequest();
+    ['Block', 'Week', 'Year'].forEach(m => document.getElementById('lvMode' + m).addEventListener('click', () => lvSetMode(m.toLowerCase())));
+    let m = 'block'; try { const v = localStorage.getItem('khoula-ed-leave-mode'); if (v === 'week' || v === 'year') m = v; } catch (e) { /* ignore */ }
+    lvMode = m; ['Block', 'Week', 'Year'].forEach(x => document.getElementById('lvMode' + x).setAttribute('aria-pressed', String(m === x.toLowerCase())));
+    renderLeaveView();
+  }
+
+  // ---------- previous blocks: the full grid of each block before this one (DATA.previous: one block or a list, newest first; read-only) ----------
+  // chips run in block order (Block 1, Block 2, ...); the block that ended last opens first
+  const PREVS = (() => { const p = DATA.previous; const arr = Array.isArray(p) ? p : (p ? [p] : []); return arr.filter(x => x && x.block && Array.isArray(x.staff)).sort((a, b) => a.block.start < b.block.start ? -1 : 1); })();
+  let prevSel = PREVS.length - 1;
+  function prevDays(P) {
+    const pn = P.block.days || 28, pstart = new Date(P.block.start + 'T00:00:00Z'), out = [];
+    for (let i = 0; i < pn; i++) { const d = new Date(pstart.getTime() + i * 86400000); out.push({ i, dow: d.getUTCDay(), dnum: d.getUTCDate(), mon: d.getUTCMonth(), year: d.getUTCFullYear(), weekend: d.getUTCDay() === 5 || d.getUTCDay() === 6 }); }
+    return out;
+  }
+  function prevSpan(P) { const pdays = prevDays(P), a = pdays[0], z = pdays[pdays.length - 1]; return a.dnum + ' ' + MON[a.mon] + (a.year !== z.year ? ' ' + a.year : '') + ' – ' + z.dnum + ' ' + MON[z.mon] + ' ' + z.year; }
+  function renderPrevChips() {
+    const el = document.getElementById('prevChips');
+    if (PREVS.length < 2) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = PREVS.map((P, i) => '<button type="button" class="chip" data-i="' + i + '" aria-pressed="' + (i === prevSel) + '"><span>' + escapeHtml(P.block.label) + '</span><small>' + escapeHtml(prevSpan(P).replace(/ 20\d\d/g, '')) + '</small></button>').join('');
+    el.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { prevSel = parseInt(c.dataset.i, 10); renderPrev(); }));
+  }
+  function renderPrev() {
+    const tab = document.getElementById('tab-prev'); if (!PREVS.length) { tab.hidden = true; return; }
+    tab.hidden = false;
+    const PREV = PREVS[Math.max(0, Math.min(prevSel, PREVS.length - 1))];
+    renderPrevChips();
+    const pn = PREV.block.days || 28;
+    const pdays = prevDays(PREV);
+    document.getElementById('prevLabel').textContent = 'Previous blocks · ' + PREV.block.label + ' · ' + prevSpan(PREV);
+    document.getElementById('prevStamp').textContent = (PREV.changes ? PREV.changes + ' change' + (PREV.changes === 1 ? '' : 's') + ' applied' : 'As issued') + (PREV.block.checkedBy ? ' · checked by ' + PREV.block.checkedBy : '') + (PREV.block.note ? ' · ' + PREV.block.note : '');
+    const we = i => pdays[i].weekend ? ' weekend' : '';
+    let html = '<table class="grid"><thead><tr><th class="name">Name</th>';
+    pdays.forEach(d => { html += '<th class="dh' + we(d.i) + '"><span class="dn">' + d.dnum + '</span><span class="dw">' + DOW[d.dow] + '</span></th>'; });
+    html += '<th class="tot" title="Clinical shifts (M, E and N)">Shifts</th></tr></thead><tbody>';
+    if (Array.isArray(PREV.thirdOnCall) && PREV.thirdOnCall.length) { html += '<tr><td class="name" title="3rd on call, by week">3rd on call</td>'; PREV.thirdOnCall.forEach(n => { html += '<td colspan="7" style="text-align:center;font-weight:600;background:var(--surface-2)">' + escapeHtml(n) + '</td>'; }); html += '<td class="tot"></td></tr>'; }
+    const row = (p, grade) => {
+      let r = '<tr><td class="name" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + (grade ? ' <span class="grade">' + escapeHtml(grade) + '</span>' : '') + '</td>';
+      let tot = 0;
+      (p.codes || []).slice(0, pn).forEach((c, i) => { const q = parse(c); if (q.kind === 'shift' || q.kind === 'admin') tot++; r += '<td class="' + we(i).trim() + '"><span class="cell ' + cellClass(q) + '" title="' + escapeHtml(q.label) + '">' + (c === '-' ? '' : escapeHtml(c)) + '</span></td>'; });
+      return r + '<td class="tot num">' + (tot || '') + '</td></tr>';
+    };
+    (PREV.staff || []).forEach(p => { html += row(p, ''); });
+    if ((PREV.residents || []).length) { html += '<tr class="section"><td class="name">OMSB residents</td><td colspan="' + (pn + 1) + '"></td></tr>'; PREV.residents.forEach(p => { html += row(p, p.grade || ''); }); }
+    if ((PREV.interns || []).length) { html += '<tr class="section"><td class="name">GFP &amp; intern</td><td colspan="' + (pn + 1) + '"></td></tr>'; PREV.interns.forEach(p => { html += row(p, p.grade || ''); }); }
+    if (PREV.famcoWeekend) { html += '<tr><td class="name" title="Family Medicine residents on the weekend mornings">FAMCO weekend</td>'; pdays.forEach(d => { html += '<td class="' + we(d.i).trim() + '">' + (d.weekend ? '<span class="cell">' + (Array.isArray(PREV.famcoWeekend) ? (PREV.famcoWeekend[d.i] || '') : PREV.famcoWeekend) + '</span>' : '') + '</td>'; }); html += '<td class="tot"></td></tr>'; }
+    html += '</tbody></table>';
+    document.getElementById('prevwrap').innerHTML = html;
+    document.getElementById('legend3').innerHTML = legendHtml();
+  }
+
+  // ---------- boot ----------
+  renderStrip();
+  renderDay();
+  renderGrid();
+  renderPicker();
+  renderPerson();
+  renderChanges();
+  renderBlockChips();
+  renderRotators();
+  renderLeave();
+  renderPrev();
+  showView(location.hash.replace('#', '') || 'day');
+  scrollSelectedIntoView();
+  detectRotaMaker();
+
+  (function () {
+    const m = DATA.mirror; if (!m) return;
+    const el = document.getElementById('blockLabel'); if (!el) return;
+    const n = document.createElement('div'); n.className = 'block'; n.style.fontSize = '12px'; n.textContent = 'Website copy · refreshed ' + m.updated;
+    el.insertAdjacentElement('afterend', n);
+  })();
+})();
+</script>
+
+</body>
+</html>
